@@ -7,7 +7,7 @@ namespace pavlinter\admoplata;
  */
 class OplataAsset extends \yii\web\AssetBundle
 {
-    public $sourcePath = '@vendor/pavlinter/yii2-adm-pages/admoplata/assets';
+    public $sourcePath = '@vendor/pavlinter/yii2-adm-oplata/admoplata/assets';
     public $css = [
 
     ];

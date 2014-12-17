@@ -71,9 +71,9 @@ class OplataTransaction extends \yii\db\ActiveRecord
     {
         return [
             'id' => Yii::t('adm/oplata_transaction', 'ID'),
-            'user_id' => Yii::t('adm/oplata_transaction', 'User ID'),
+            'user_id' => Yii::t('adm/oplata_transaction', 'User'),
             'email' => Yii::t('adm/oplata_transaction', 'Email'),
-            'payment_id' => Yii::t('adm/oplata_transaction', 'Payment ID'),
+            'payment_id' => Yii::t('adm/oplata_transaction', 'Payment'),
             'price' => Yii::t('adm/oplata_transaction', 'Price'),
             'shipping' => Yii::t('adm/oplata_transaction', 'Shipping'),
             'currency' => Yii::t('adm/oplata_transaction', 'Currency'),

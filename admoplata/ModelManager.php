@@ -25,5 +25,5 @@ class ModelManager extends Manager
     /**
      * @var string|\pavlinter\admoplata\models\OplataTransactionSearch
      */
-    public $oplataTransactionSearchClass = 'pavlinter\admpages\models\OplataTransactionSearch';
+    public $oplataTransactionSearchClass = 'pavlinter\admoplata\models\OplataTransactionSearch';
 }

@@ -48,8 +48,8 @@ class Module extends \yii\base\Module implements BootstrapInterface
         /* @var $adm \pavlinter\adm\Adm */
         if ($adm->user->can('Adm-Pages')) {
             $adm->params['left-menu']['admoplata'] = [
-                'label' => '<i class="fa fa-file-text"></i><span>' . $adm::t('admoplata','Oplata') . '</span>',
-                'url' => ['/' . $adm->id . '/admoplata/page/index']
+                'label' => '<i class="fa fa-usd"></i><span>' . $adm::t('admoplata','Oplata') . '</span>',
+                'url' => ['/' . $adm->id . '/admoplata/transaction/index']
             ];
         }
     }
