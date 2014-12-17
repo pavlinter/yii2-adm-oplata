@@ -30,6 +30,9 @@ class OplataTransaction extends \yii\db\ActiveRecord
     const CURRENCY_RUB = "RUB";
     const CURRENCY_UAH = "UAH";
 
+    const STATUS_NOT_PAID = 'not paid';
+    const STATUS_FAILURE  = 'failure';
+    const STATUS_SUCCESS  = 'success';
     /**
      * @inheritdoc
      */
@@ -78,11 +81,11 @@ class OplataTransaction extends \yii\db\ActiveRecord
             'shipping' => Yii::t('adm/oplata_transaction', 'Shipping'),
             'currency' => Yii::t('adm/oplata_transaction', 'Currency'),
             'order_status' => Yii::t('adm/oplata_transaction', 'Order Status'),
-            'response_status' => Yii::t('adm/oplata_transaction', 'Response Status'),
+            'response_status' => Yii::t('adm/oplata_transaction', 'Status'),
             'data' => Yii::t('adm/oplata_transaction', 'Data'),
             'response_data' => Yii::t('adm/oplata_transaction', 'Response Data'),
             'alias' => Yii::t('adm/oplata_transaction', 'Alias'),
-            'created_at' => Yii::t('adm/oplata_transaction', 'Created At'),
+            'created_at' => Yii::t('adm/oplata_transaction', 'Created'),
         ];
     }
 
@@ -98,7 +101,7 @@ class OplataTransaction extends \yii\db\ActiveRecord
      * @param null $currency
      * @return array|null
      */
-    public static function currency_list($currency = null)
+    public static function currency_list($currency = false)
     {
         $list = [
             self::CURRENCY_EUR => Yii::t('adm/oplata_transaction', 'EUR'),
@@ -115,5 +118,20 @@ class OplataTransaction extends \yii\db\ActiveRecord
         return $list;
     }
 
+    public static function status_list($status = false)
+    {
+        $list = [
+            self::STATUS_NOT_PAID => Yii::t('adm/oplata_transaction', 'Not paid'),
+            self::STATUS_FAILURE => Yii::t('adm/oplata_transaction', 'Failure'),
+            self::STATUS_SUCCESS => Yii::t('adm/oplata_transaction', 'Success'),
+        ];
+        if ($status !== false) {
+            if (isset($list[$status])) {
+                return $list[$status];
+            }
+            return null;
+        }
+        return $list;
+    }
 
 }

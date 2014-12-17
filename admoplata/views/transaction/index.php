@@ -1,5 +1,7 @@
 <?php
 
+use kartik\grid\GridView;
+use pavlinter\admoplata\Module;
 use yii\helpers\Html;
 use pavlinter\adm\Adm;
 
@@ -26,22 +28,71 @@ $this->params['breadcrumbs'][] = $this->title;
         'filterModel' => $searchModel,
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
+            [
+                'attribute' => 'id',
+                'vAlign' => 'middle',
+                'hAlign' => 'center',
+            ],
+            [
+                'attribute' => 'payment_id',
+                'vAlign' => 'middle',
+                'hAlign' => 'center',
+            ],
+            [
+                'attribute' => 'email',
+                'vAlign' => 'middle',
+                'hAlign' => 'center',
+                'format' => 'raw',
+                'value' => function ($model) {
+                    if (!$model->user_id) {
+                        return Yii::$app->formatter->asEmail($model->email);
+                    }
+                },
+            ],
+            [
+                'attribute' => 'price',
+                'vAlign' => 'middle',
+                'hAlign' => 'center',
+                'value' => function ($model) {
+                    $currency = Module::getInstance()->manager->createOplataTransactionQuery('currency_list', $model->currency);
+                    return Yii::$app->formatter->asDecimal($model->price + $model->shipping, 2) . ' ' . $currency;
+                },
+            ],
+            [
+                'attribute' => 'created_at',
+                'vAlign' => 'middle',
+                'hAlign' => 'center',
+                'format' => 'datetime',
+                'value' => function ($model) {
+                    return $model->created_at;
+                },
+            ],
+            [
+                'attribute' => 'response_status',
+                'vAlign' => 'middle',
+                'hAlign' => 'center',
+                'filterType' => GridView::FILTER_SELECT2,
+                'filter'=> Module::getInstance()->manager->createOplataTransactionQuery('status_list'),
+                'value' => function ($model) {
+                    if (empty($model->response_status)) {
 
-            'id',
-            'user_id',
-            'email:email',
-            'payment_id',
-            'price',
-            // 'shipping',
-            // 'currency',
+                    } else {
+                        return Module::getInstance()->manager->createOplataTransactionQuery('status_list', $model->response_status);
+                    }
+                },
+                'filterWidgetOptions' => [
+                    'pluginOptions' => ['allowClear' =>true ],
+                ],
+                'filterInputOptions' => ['placeholder' => Adm::t('','Select ...', ['dot' => false])],
+                'format' => 'raw'
+            ],
             // 'order_status',
             // 'response_status',
-            // 'data:ntext',
-            // 'response_data:ntext',
-            // 'alias',
-            // 'created_at',
 
-            ['class' => 'yii\grid\ActionColumn'],
+            [
+                'class' => '\kartik\grid\ActionColumn',
+                'width' => '130px',
+            ],
         ],
     ]); ?>
 
