@@ -6,24 +6,24 @@ use pavlinter\adm\Manager;
 use Yii;
 
 /**
- * @method \pavlinter\admoplata\models\Page createPage
- * @method \pavlinter\admoplata\models\Page createPageQuery
- * @method \pavlinter\admoplata\models\PageSearch createPageSearch
- * @method \pavlinter\admoplata\models\PageLang createPageLang
- * @method \pavlinter\admoplata\models\PageLang createPageLangQuery
+ * @method \pavlinter\admoplata\models\OplataItem createOplataItem
+ * @method \pavlinter\admoplata\models\OplataItem createOplataItemQuery
+ * @method \pavlinter\admoplata\models\OplataItem createOplataTransaction
+ * @method \pavlinter\admoplata\models\OplataItem createOplataTransactionQuery
+ * @method \pavlinter\admoplata\models\OplataItem createOplataTransactionSearch
  */
 class ModelManager extends Manager
 {
     /**
-     * @var string|\pavlinter\admoplata\models\Page
+     * @var string|\pavlinter\admoplata\models\OplataItem
      */
-    public $pageClass = 'pavlinter\admpages\models\Page';
+    public $oplataItemClass = 'pavlinter\admpages\models\OplataItem';
     /**
-     * @var string|\pavlinter\admoplata\models\PageSearch
+     * @var string|\pavlinter\admoplata\models\OplataTransaction
      */
-    public $pageSearchClass = 'pavlinter\admpages\models\PageSearch';
+    public $oplataTransactionClass = 'pavlinter\admoplata\models\OplataTransaction';
     /**
-     * @var string|\pavlinter\admoplata\models\PageLang
+     * @var string|\pavlinter\admoplata\models\OplataTransactionSearch
      */
-    public $pageLangClass = 'pavlinter\admoplata\models\PageLang';
+    public $oplataTransactionSearchClass = 'pavlinter\admpages\models\OplataTransactionSearch';
 }
