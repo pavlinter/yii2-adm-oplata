@@ -11,9 +11,10 @@ use Yii;
  * @property string $oplata_transaction_id
  * @property string $title
  * @property string $description
+ * @property string $amount
  * @property string $price
  *
- * @property OplataTransaction $oplataTransaction
+ * @property Transaction $oplataTransaction
  */
 class OplataItem extends \yii\db\ActiveRecord
 {
@@ -31,10 +32,10 @@ class OplataItem extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['title', 'price'], 'required'],
-            [['oplata_transaction_id'], 'integer'],
+            [['title', 'price', 'amount'], 'required'],
+            [['oplata_transaction_id', 'amount'], 'integer'],
             [['description'], 'string'],
-            [['price'], 'number'],
+            [['price'], 'double'],
             [['title'], 'string', 'max' => 200]
         ];
     }
@@ -64,7 +65,7 @@ class OplataItem extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getOplataTransaction()
+    public function getTransaction()
     {
         return $this->hasOne(OplataTransaction::className(), ['id' => 'oplata_transaction_id']);
     }

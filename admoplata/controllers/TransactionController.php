@@ -4,8 +4,7 @@ namespace pavlinter\admoplata\controllers;
 
 use pavlinter\admoplata\Module;
 use Yii;
-use pavlinter\admoplata\models\OplataTransaction;
-use app\models\OplataTransactionSearch;
+use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -16,11 +15,20 @@ use yii\filters\VerbFilter;
 class TransactionController extends Controller
 {
     /**
-    * @inheritdoc
-    */
+     * @inheritdoc
+     */
     public function behaviors()
     {
         return [
+            'access' => [
+                'class' => AccessControl::className(),
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['AdmRoot'],
+                    ],
+                ],
+            ],
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [

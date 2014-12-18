@@ -9,7 +9,7 @@ class OplataAsset extends \yii\web\AssetBundle
 {
     public $sourcePath = '@vendor/pavlinter/yii2-adm-oplata/admoplata/assets';
     public $css = [
-
+        'css/invoice.css',
     ];
     public $js = [
         'js/common.js',

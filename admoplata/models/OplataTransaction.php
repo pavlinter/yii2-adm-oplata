@@ -3,6 +3,9 @@
 namespace pavlinter\admoplata\models;
 
 use Yii;
+use yii\behaviors\TimestampBehavior;
+use yii\db\BaseActiveRecord;
+use yii\db\Expression;
 
 /**
  * This is the model class for table "{{%oplata_transaction}}".
@@ -10,6 +13,7 @@ use Yii;
  * @property string $id
  * @property integer $user_id
  * @property string $email
+ * @property string $description
  * @property string $payment_id
  * @property string $price
  * @property string $shipping
@@ -21,7 +25,7 @@ use Yii;
  * @property string $alias
  * @property string $created_at
  *
- * @property OplataItem[] $oplataItems
+ * @property OplataItem[] $items
  */
 class OplataTransaction extends \yii\db\ActiveRecord
 {
@@ -33,6 +37,23 @@ class OplataTransaction extends \yii\db\ActiveRecord
     const STATUS_NOT_PAID = 'not paid';
     const STATUS_FAILURE  = 'failure';
     const STATUS_SUCCESS  = 'success';
+
+    /**
+     * @inheritdoc
+     */
+    public function behaviors()
+    {
+        return [
+            [
+                'class' => TimestampBehavior::className(),
+                'value' => new Expression('NOW()'),
+                'attributes' => [
+                    BaseActiveRecord::EVENT_BEFORE_INSERT => ['created_at'],
+                ],
+            ],
+        ];
+    }
+
     /**
      * @inheritdoc
      */
@@ -48,14 +69,15 @@ class OplataTransaction extends \yii\db\ActiveRecord
     {
         return [
             [['user_id', 'payment_id'], 'integer'],
-            [['payment_id', 'price', 'currency', 'order_status', 'response_status', 'alias', 'created_at'], 'required'],
-            [['price', 'shipping'], 'number'],
-            [['data', 'response_data'], 'string'],
-            [['created_at'], 'safe'],
-            [['email'], 'string', 'max' => 255],
+            [['price', 'currency','response_status', 'alias', 'description'], 'required'],
+            [['price', 'shipping'], 'double'],
+            [['email'], 'email'],
             [['currency'], 'in', 'range' => array_keys(self::currency_list())],
+            [['data', 'response_data'], 'safe'],
             [['order_status', 'response_status'], 'string', 'max' => 50],
-            [['alias'], 'string', 'max' => 32]
+            [['description'], 'string', 'max' => 1024],
+            [['email'], 'string', 'max' => 255],
+            [['alias'], 'string', 'max' => 32],
         ];
     }
 
@@ -65,8 +87,42 @@ class OplataTransaction extends \yii\db\ActiveRecord
     public function scenarios()
     {
         $scenarios = parent::scenarios();
+        $scenarios['createOrder'] = ['user_id', 'email', 'shipping', 'data', 'description', 'currency'];
+
         return $scenarios;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function beforeSave($insert)
+    {
+        if (is_array($this->data) || is_object($this->data)) {
+            $this->data = serialize($this->data);
+        }
+        if (is_array($this->response_data) || is_object($this->response_data)) {
+            $this->response_data = serialize($this->response_data);
+        }
+        return parent::beforeSave($insert);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function afterFind()
+    {
+        $data = @unserialize($this->data);
+        if ($data !== false) {
+            $this->data = $data;
+        }
+        $response_data = @unserialize($this->response_data);
+        if ($response_data !== false) {
+            $this->response_data = $response_data;
+        }
+
+        return parent::afterFind();
+    }
+
     /**
      * @inheritdoc
      */
@@ -92,7 +148,7 @@ class OplataTransaction extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getOplataItems()
+    public function getItems()
     {
         return $this->hasMany(OplataItem::className(), ['oplata_transaction_id' => 'id']);
     }

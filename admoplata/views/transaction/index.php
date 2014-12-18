@@ -27,11 +27,11 @@ $this->params['breadcrumbs'][] = $this->title;
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
             [
                 'attribute' => 'id',
                 'vAlign' => 'middle',
                 'hAlign' => 'center',
+                'width' => '70px',
             ],
             [
                 'attribute' => 'payment_id',
@@ -54,19 +54,10 @@ $this->params['breadcrumbs'][] = $this->title;
                 'vAlign' => 'middle',
                 'hAlign' => 'center',
                 'value' => function ($model) {
-                    $currency = Module::getInstance()->manager->createOplataTransactionQuery('currency_list', $model->currency);
-                    return Yii::$app->formatter->asDecimal($model->price + $model->shipping, 2) . ' ' . $currency;
+                    return Yii::$app->oplata->price($model->price + $model->shipping, $model->currency);
                 },
             ],
-            [
-                'attribute' => 'created_at',
-                'vAlign' => 'middle',
-                'hAlign' => 'center',
-                'format' => 'datetime',
-                'value' => function ($model) {
-                    return $model->created_at;
-                },
-            ],
+
             [
                 'attribute' => 'response_status',
                 'vAlign' => 'middle',
@@ -74,9 +65,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'filterType' => GridView::FILTER_SELECT2,
                 'filter'=> Module::getInstance()->manager->createOplataTransactionQuery('status_list'),
                 'value' => function ($model) {
-                    if (empty($model->response_status)) {
-
-                    } else {
+                    if (!empty($model->response_status)) {
                         return Module::getInstance()->manager->createOplataTransactionQuery('status_list', $model->response_status);
                     }
                 },
@@ -86,12 +75,26 @@ $this->params['breadcrumbs'][] = $this->title;
                 'filterInputOptions' => ['placeholder' => Adm::t('','Select ...', ['dot' => false])],
                 'format' => 'raw'
             ],
-            // 'order_status',
-            // 'response_status',
-
+            [
+                'attribute' => 'created_at',
+                'vAlign' => 'middle',
+                'hAlign' => 'center',
+                'format' => 'datetime',
+            ],
             [
                 'class' => '\kartik\grid\ActionColumn',
                 'width' => '130px',
+                'buttons' => [
+                    'view' => function ($url, $model) {
+                        if ($model->alias) {
+                            return Html::a('<span class="glyphicon glyphicon-eye-open"></span>', ['default/invoice', 'alias' => $model->alias], [
+                                'title' => Yii::t('yii', 'View'),
+                                'data-pjax' => '0',
+                                'target' => '_blank'
+                            ]);
+                        }
+                    },
+                ],
             ],
         ],
     ]); ?>

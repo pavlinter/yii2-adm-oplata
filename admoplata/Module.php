@@ -14,9 +14,7 @@ class Module extends \yii\base\Module implements BootstrapInterface
 {
     public $controllerNamespace = 'pavlinter\admoplata\controllers';
 
-    public $merchantId;
-
-    public $merchantPassword;
+    public $invoiceLayout = '/main';
 
     /**
      * @inheritdoc

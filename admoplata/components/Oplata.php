@@ -1,12 +1,17 @@
 <?php
 
 namespace pavlinter\admoplata\components;
+
+use pavlinter\admoplata\models\OplataTransaction;
 use pavlinter\admoplata\Module;
+use Yii;
+use yii\base\Component;
+use yii\base\InvalidConfigException;
 
 /**
  * Class Oplata
  */
-class Oplata extends \yii\base\Object
+class Oplata extends Component
 {
     const ORDER_APPROVED = 'approved';
     const ORDER_DECLINED = 'declined';
@@ -16,6 +21,8 @@ class Oplata extends \yii\base\Object
     public $merchantId;
 
     public $password;
+
+    public $url = 'https://api.oplata.com/api/checkout/redirect/'; //'https://api.oplata.com/api/checkout/url/';
 
     public $responseFields = [
         'rrn',
@@ -48,17 +55,20 @@ class Oplata extends \yii\base\Object
         'sender_email'
     ];
 
+    private $items = [];
     private $errors;
     private $response;
 
     public function init()
     {
         if ($this->merchantId === null) {
-            $this->merchantId = Module::getInstance()->merchantId;
+            throw new InvalidConfigException('The "merchantId" property must be set.');
         }
         if ($this->password === null) {
-            $this->password = Module::getInstance()->merchantPassword;
+            throw new InvalidConfigException('The "password" property must be set.');
         }
+
+        Yii::$app->getModule('adm'); // load module
     }
 
 
@@ -141,12 +151,93 @@ class Oplata extends \yii\base\Object
             $order->payment_id = $response['payment_id'];
             $order->order_status = $response['order_status'];
             $order->response_status = $response['response_status'];
-            $order->data = $data;
+            $order->response_data = $data;
             if (!$order->save(false)) {
                 return false;
             }
         }
         return true;
+    }
+
+
+    /**
+     * @param $data
+     * @return bool|string
+     */
+    public function createOrder($data)
+    {
+        $this->clearErrors();
+        $items = $this->getItems();
+
+        if (empty($items)) {
+            $this->setError('Basket is empty!');
+            return false;
+        }
+
+        $price = 0;
+        foreach ($items as $item) {
+            /* @var $item \pavlinter\admoplata\models\OplataItem */
+            if (!$item->validate()) {
+                $this->setError(reset($item->getErrors()));
+                return false;
+            }
+            $price += $item->price * $item->amount;
+        }
+
+        $order = Module::getInstance()->manager->createOplataTransaction();
+        /* @var $order \pavlinter\admoplata\models\OplataTransaction */
+        $order->setScenario('createOrder');
+        if ($order->load($data, '') && $order->validate()) {
+            $order->price = $price;
+            $order->response_status = OplataTransaction::STATUS_NOT_PAID;
+            $order->alias = md5(serialize($order) . uniqid('oplata_', true));
+            $order->save(false);
+
+            foreach ($items as $item) {
+                $order->link('items', $item);
+            }
+            return $order->id;
+        }
+        $this->setError(reset($order->getErrors()));
+        return false;
+    }
+
+    /**
+     * @param $int
+     * @param $currency
+     * @return string
+     */
+    public function price($int, $currency)
+    {
+        if ($currency) {
+            $currency = ' ' . Module::getInstance()->manager->createOplataTransactionQuery('currency_list', $currency);
+        } else {
+            $currency = null;
+        }
+        return Yii::$app->formatter->asDecimal($int, 2) . $currency;
+    }
+
+    /**
+     * @param $item
+     */
+    public function addItem($item)
+    {
+        $this->items[] = $item;
+    }
+    /**
+     * @return array
+     */
+    public function getItems()
+    {
+        return $this->items;
+    }
+
+    /**
+     *
+     */
+    public function clearItems()
+    {
+        $this->items = [];
     }
 
     /**
