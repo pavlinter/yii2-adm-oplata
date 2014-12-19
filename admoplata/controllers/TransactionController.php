@@ -3,11 +3,13 @@
 namespace pavlinter\admoplata\controllers;
 
 use pavlinter\admoplata\Module;
+use pavlinter\multifields\ModelHelper;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\Response;
 
 /**
  * TransactionController implements the CRUD actions for OplataTransaction model.
@@ -32,7 +34,7 @@ class TransactionController extends Controller
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
-                    'delete' => ['post'],
+                    'delete' => ['post', 'delete-item'],
                 ],
             ],
         ];
@@ -54,18 +56,6 @@ class TransactionController extends Controller
     }
 
     /**
-     * Displays a single OplataTransaction model.
-     * @param string $id
-     * @return mixed
-     */
-    public function actionView($id)
-    {
-        return $this->render('view', [
-            'model' => $this->findModel($id),
-        ]);
-    }
-
-    /**
      * Creates a new OplataTransaction model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
@@ -73,11 +63,54 @@ class TransactionController extends Controller
     public function actionCreate()
     {
         $model = Module::getInstance()->manager->createOplataTransaction();
+        /* @var $model \pavlinter\admoplata\models\OplataTransaction */
+        $model->setScenario('admCreate');
+        $model->loadDefaultValues();
+        $items = [Module::getInstance()->manager->createOplataItem(['scenario' => 'multiFields'])];
+
+        if(Yii::$app->request->isPost) {
+
+            $loaded = $model->load(Yii::$app->request->post());
+            $loaded = ModelHelper::load($items) && $loaded;
+
+            if ($loaded) {
+                if (ModelHelper::validate([$model, $items])) {
+                    $model->price = 0;
+                    foreach ($items as $item) {
+                        $model->price += $item->price * $item->amount;
+                    }
+                    $model->save(false);
+                    $newId = [];
+                    foreach ($items as $oldId => $item) {
+                        $item->oplata_transaction_id = $model->id;
+                        $item->save(false);
+                        ModelHelper::ajaxChangeField($newId, $item, 'title', $oldId);
+                        ModelHelper::ajaxChangeField($newId, $item, 'description', $oldId);
+                        ModelHelper::ajaxChangeField($newId, $item, 'amount', $oldId);
+                        ModelHelper::ajaxChangeField($newId, $item, 'price', $oldId);
+                    }
+                    if (Yii::$app->request->isAjax) {
+                        Yii::$app->response->format = Response::FORMAT_JSON;
+                        return ['r' =>1, 'newId' => $newId];
+                    } else {
+                        return $this->redirect(['index']);
+                    }
+                } else {
+                    if (Yii::$app->request->isAjax) {
+                        Yii::$app->response->format = Response::FORMAT_JSON;
+                        $errors = ModelHelper::ajaxErrors([$model, $items]);
+                        return ['r' => 0, 'errors' => $errors];
+                    }
+                }
+            }
+        }
+
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
         }
         return $this->render('create', [
             'model' => $model,
+            'items' => $items,
         ]);
     }
 
@@ -90,11 +123,58 @@ class TransactionController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        $model->setScenario('admUpdate');
+        /* @var $model \pavlinter\admoplata\models\OplataTransaction */
+
+        $items = $model->getItems()->indexBy('id')->all();
+        //$items = Module::getInstance()->manager->createOplataItemQuery()->where(['oplata_transaction_id' => $id])->indexBy('id')->all();
+        if (empty($items)) {
+            $items[] = Module::getInstance()->manager->createOplataItem(['scenario' => 'multiFields']);
+        } else {
+            foreach ($items as $item) {
+                $item->scenario = 'multiFields';
+            }
         }
+
+        if(Yii::$app->request->isPost) {
+
+            $loaded = $model->load(Yii::$app->request->post());
+            $loaded = ModelHelper::load($items) && $loaded;
+
+            if ($loaded) {
+
+                if (ModelHelper::validate([$model, $items])) {
+                    $model->save(false);
+                    $newId = [];
+                    foreach ($items as $oldId => $item) {
+                        $item->oplata_transaction_id = $model->id;
+                        $item->save(false);
+                        ModelHelper::ajaxChangeField($newId, $item, 'title', $oldId);
+                        ModelHelper::ajaxChangeField($newId, $item, 'description', $oldId);
+                        ModelHelper::ajaxChangeField($newId, $item, 'amount', $oldId);
+                        ModelHelper::ajaxChangeField($newId, $item, 'price', $oldId);
+                    }
+
+                    if (Yii::$app->request->isAjax) {
+                        Yii::$app->response->format = Response::FORMAT_JSON;
+                        return ['r' =>1, 'newId' => $newId];
+                    } else {
+                        return $this->redirect(['index']);
+                    }
+                } else {
+                    if (Yii::$app->request->isAjax) {
+                        Yii::$app->response->format = Response::FORMAT_JSON;
+                        $errors = ModelHelper::ajaxErrors([$model, $items]);
+                        return ['r' => 0, 'errors' => $errors];
+                    }
+                }
+            }
+        }
+
+
         return $this->render('update', [
             'model' => $model,
+            'items' => $items,
         ]);
     }
 
@@ -109,6 +189,20 @@ class TransactionController extends Controller
         $this->findModel($id)->delete();
 
         return $this->redirect(['index']);
+    }
+
+    /**
+     * @return array
+     */
+    public function actionDeleteItem()
+    {
+        $id = Yii::$app->request->post('id');
+        $model = Module::getInstance()->manager->createOplataItemQuery('findOne', $id);
+        if ($model !== null) {
+            $model->delete();
+        }
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        return ['r' => 1];
     }
 
     /**

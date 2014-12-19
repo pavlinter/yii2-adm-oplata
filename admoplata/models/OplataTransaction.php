@@ -73,6 +73,7 @@ class OplataTransaction extends \yii\db\ActiveRecord
             [['price', 'shipping'], 'double'],
             [['email'], 'email'],
             [['currency'], 'in', 'range' => array_keys(self::currency_list())],
+            [['response_status'], 'in', 'range' => array_keys(self::status_list())],
             [['data', 'response_data'], 'safe'],
             [['order_status', 'response_status'], 'string', 'max' => 50],
             [['description'], 'string', 'max' => 1024],
@@ -88,6 +89,8 @@ class OplataTransaction extends \yii\db\ActiveRecord
     {
         $scenarios = parent::scenarios();
         $scenarios['createOrder'] = ['user_id', 'email', 'shipping', 'data', 'description', 'currency'];
+        $scenarios['admCreate'] = ['user_id', 'email', 'shipping', 'description', 'currency', 'response_status'];
+        $scenarios['admUpdate'] = $scenarios['admCreate'];
 
         return $scenarios;
     }
@@ -102,6 +105,9 @@ class OplataTransaction extends \yii\db\ActiveRecord
         }
         if (is_array($this->response_data) || is_object($this->response_data)) {
             $this->response_data = serialize($this->response_data);
+        }
+        if (in_array($this->scenario, ['admCreate', 'createOrder'])) {
+            $this->alias = md5(serialize($this) . uniqid('oplata_', true));
         }
         return parent::beforeSave($insert);
     }
@@ -174,6 +180,10 @@ class OplataTransaction extends \yii\db\ActiveRecord
         return $list;
     }
 
+    /**
+     * @param bool $status
+     * @return array|null
+     */
     public static function status_list($status = false)
     {
         $list = [

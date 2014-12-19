@@ -17,7 +17,7 @@ class ModelManager extends Manager
     /**
      * @var string|\pavlinter\admoplata\models\OplataItem
      */
-    public $oplataItemClass = 'pavlinter\admpages\models\OplataItem';
+    public $oplataItemClass = 'pavlinter\admoplata\models\OplataItem';
     /**
      * @var string|\pavlinter\admoplata\models\OplataTransaction
      */

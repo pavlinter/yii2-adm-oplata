@@ -190,7 +190,6 @@ class Oplata extends Component
         if ($order->load($data, '') && $order->validate()) {
             $order->price = $price;
             $order->response_status = OplataTransaction::STATUS_NOT_PAID;
-            $order->alias = md5(serialize($order) . uniqid('oplata_', true));
             $order->save(false);
 
             foreach ($items as $item) {

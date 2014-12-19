@@ -6,11 +6,10 @@ use pavlinter\adm\Adm;
 /* @var $this yii\web\View */
 /* @var $model pavlinter\admoplata\models\OplataTransaction */
 
-$this->title = Adm::t('oplata', 'Update {modelClass}: ', [
+$this->title = Adm::t('oplata', 'Update Order: ', [
     'modelClass' => 'Oplata Transaction',
-]) . ' ' . $model->id;
-$this->params['breadcrumbs'][] = ['label' => Adm::t('oplata', 'Oplata Transactions'), 'url' => ['index']];
-$this->params['breadcrumbs'][] = ['label' => $model->id, 'url' => ['view', 'id' => $model->id]];
+]) . ' #' . $model->id;
+$this->params['breadcrumbs'][] = ['label' => Adm::t('oplata', 'List'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = Adm::t('oplata', 'Update');
 ?>
 <div class="oplata-transaction-update">
@@ -19,6 +18,7 @@ $this->params['breadcrumbs'][] = Adm::t('oplata', 'Update');
 
     <?= $this->render('_form', [
         'model' => $model,
+        'items' => $items,
     ]) ?>
 
 </div>

@@ -33,7 +33,8 @@ class OplataItem extends \yii\db\ActiveRecord
     {
         return [
             [['title', 'price', 'amount'], 'required'],
-            [['oplata_transaction_id', 'amount'], 'integer'],
+            [['oplata_transaction_id'], 'integer'],
+            [['amount'], 'integer', 'min' => 1],
             [['description'], 'string'],
             [['price'], 'double'],
             [['title'], 'string', 'max' => 200]
@@ -46,6 +47,7 @@ class OplataItem extends \yii\db\ActiveRecord
     public function scenarios()
     {
         $scenarios = parent::scenarios();
+        $scenarios['multiFields'] = ['title', 'description', 'price', 'amount'];
         return $scenarios;
     }
     /**

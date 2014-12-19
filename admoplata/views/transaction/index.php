@@ -9,18 +9,15 @@ use pavlinter\adm\Adm;
 /* @var $searchModel app\models\OplataTransactionSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = Adm::t('oplata', 'Oplata Transactions');
+$this->title = Adm::t('oplata', 'Orders');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="oplata-transaction-index">
 
     <h1><?= Html::encode($this->title) ?></h1>
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <p>
-        <?= Html::a(Adm::t('oplata', 'Create {modelClass}', [
-    'modelClass' => 'Oplata Transaction',
-]), ['create'], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a(Adm::t('oplata', 'Create Order'), ['create'], ['class' => 'btn btn-primary']) ?>
     </p>
 
     <?= Adm::widget('GridView',[
