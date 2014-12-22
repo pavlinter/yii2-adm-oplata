@@ -47,7 +47,8 @@ class Module extends \yii\base\Module implements BootstrapInterface
         if ($adm->user->can('Adm-Pages')) {
             $adm->params['left-menu']['admoplata'] = [
                 'label' => '<i class="fa fa-usd"></i><span>' . $adm::t('admoplata','Oplata') . '</span>',
-                'url' => ['/' . $adm->id . '/admoplata/transaction/index']
+                'url' => ['/' . $adm->id . '/admoplata/transaction/index'],
+                'visible' => $adm->user->can('Adm-OplataRead'),
             ];
         }
     }

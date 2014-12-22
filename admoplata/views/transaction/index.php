@@ -91,6 +91,26 @@ $this->params['breadcrumbs'][] = $this->title;
                             ]);
                         }
                     },
+                    'update' => function ($url, $model) {
+                        if (!Adm::getInstance()->user->can('Adm-OplataUpdate')) {
+                            return null;
+                        }
+                        return Html::a('<span class="glyphicon glyphicon-pencil"></span>', $url, [
+                            'title' => Yii::t('yii', 'Update'),
+                            'data-pjax' => '0',
+                        ]);
+                    },
+                    'delete' => function ($url, $model) {
+                        if (!Adm::getInstance()->user->can('Adm-OplataDelete')) {
+                            return null;
+                        }
+                        return Html::a('<span class="glyphicon glyphicon-trash"></span>', $url, [
+                            'title' => Yii::t('yii', 'Delete'),
+                            'data-confirm' => Yii::t('yii', 'Are you sure you want to delete this item?'),
+                            'data-method' => 'post',
+                            'data-pjax' => '0',
+                        ]);
+                    },
                 ],
             ],
         ],

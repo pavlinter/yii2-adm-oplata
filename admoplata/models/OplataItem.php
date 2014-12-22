@@ -2,6 +2,7 @@
 
 namespace pavlinter\admoplata\models;
 
+use pavlinter\admoplata\Module;
 use Yii;
 
 /**
@@ -69,6 +70,6 @@ class OplataItem extends \yii\db\ActiveRecord
      */
     public function getTransaction()
     {
-        return $this->hasOne(OplataTransaction::className(), ['id' => 'oplata_transaction_id']);
+        return $this->hasOne(Module::getInstance()->manager->createOplataTransaction('className'), ['id' => 'oplata_transaction_id']);
     }
 }

@@ -4,6 +4,7 @@ use pavlinter\admoplata\Module;
 use pavlinter\multifields\MultiFields;
 use yii\helpers\Html;
 use yii\helpers\Url;
+use yii\web\JsExpression;
 use yii\widgets\ActiveForm;
 use pavlinter\adm\Adm;
 
@@ -11,46 +12,7 @@ use pavlinter\adm\Adm;
 /* @var $model pavlinter\admoplata\models\OplataTransaction */
 /* @var $form yii\widgets\ActiveForm */
 
-
-$this->registerJs('
-    $("#oplatatransaction-user_id").on("select2-selecting", function(e){
-        $("#oplatatransaction-email").prop("disabled",true);
-    }).on("select2-removed", function(e){
-        $("#oplatatransaction-email").prop("disabled",false);
-    });
-    if($("#oplatatransaction-user_id").select2("val")){
-        $("#oplatatransaction-email").prop("disabled",true);
-    }
-
-    $("#order-form").on("beforeSubmit",function(e){
-        var $form = $(this);
-        jQuery.ajax({
-                url: $form.attr("action"),
-                type: "POST",
-                dataType: "json",
-                data: $form.serialize(),
-                success: function(d) {
-                    if(d.r) {
-                        location.href = "' . Url::to(['index']) . '";
-                    } else {
-                        $form.trigger("updateErrors",[d.errors]).trigger("scrollToError");
-                    }
-                },
-            });
-        return false;
-    });
-
-    $(".cloneBtn").on("afterAppend.mf", function(e,clone,settings){
-        $("html, body").animate({
-            scrollTop: $("." + settings.parentClass + ":last").offset().top
-        }, 1000);
-    });
-');
-
-
 $users = Adm::getInstance()->manager->createUserQuery()->all();
-
-
 
 ?>
 
@@ -141,6 +103,19 @@ $users = Adm::getInstance()->manager->createUserQuery()->all();
                 ],
                 'clientOptions' => [
                     'deleteRouter' => Url::to(['delete-item']),
+                    'deleteCallback' => new JsExpression('function(data,$row,$form){
+                        if(data.r){
+                            $row.remove();
+                            if (typeof data.price !== "undefined"){
+                                $("#oplatatransaction-price").val(data.price);
+                            }
+                        }else{
+                            $row.show();
+                        }
+                    }'),
+                    'completeDelete' => new JsExpression('function(parent,form){
+
+                    }'),
                 ],
                 'templateFields' => '{title}{description}<div class="row"><div class="col-md-6">{price}</div><div class="col-md-6">{amount}</div></div>',
                 'template' => function($parentOptions, $closeButtonClass, $templateFields){ //default
@@ -182,4 +157,39 @@ $users = Adm::getInstance()->manager->createUserQuery()->all();
 </div>
 
 
+<?php
 
+$this->registerJs('
+    $("#oplatatransaction-user_id").on("select2-selecting", function(e){
+        $("#oplatatransaction-email").prop("disabled",true);
+    }).on("select2-removed", function(e){
+        $("#oplatatransaction-email").prop("disabled",false);
+    });
+    if($("#oplatatransaction-user_id").select2("val")){
+        $("#oplatatransaction-email").prop("disabled",true);
+    }
+
+    $("#order-form").on("beforeSubmit",function(e){
+        var $form = $(this);
+        jQuery.ajax({
+                url: $form.attr("action"),
+                type: "POST",
+                dataType: "json",
+                data: $form.serialize(),
+                success: function(d) {
+                    if(d.r) {
+                        location.href = "' . Url::to(['index']) . '";
+                    } else {
+                        $form.trigger("updateErrors",[d.errors]).trigger("scrollToError");
+                    }
+                },
+            });
+        return false;
+    });
+
+    $(".cloneBtn").on("afterAppend.mf", function(e,clone,settings){
+        $("html, body").animate({
+            scrollTop: $("." + settings.parentClass + ":last").offset().top
+        }, 1000);
+    });
+');

@@ -2,10 +2,10 @@
 
 namespace pavlinter\admoplata\controllers;
 
+use pavlinter\adm\filters\AccessControl;
 use pavlinter\admoplata\Module;
 use pavlinter\multifields\ModelHelper;
 use Yii;
-use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -27,14 +27,36 @@ class TransactionController extends Controller
                 'rules' => [
                     [
                         'allow' => true,
-                        'roles' => ['AdmRoot'],
+                        'actions' => ['index'],
+                        'roles' => ['Adm-OplataRead'],
+                    ],
+                    [
+                        'allow' => true,
+                        'actions' => ['create'],
+                        'roles' => ['Adm-OplataCreate'],
+                    ],
+                    [
+                        'allow' => true,
+                        'actions' => ['update'],
+                        'roles' => ['Adm-OplataUpdate'],
+                    ],
+                    [
+                        'allow' => true,
+                        'actions' => ['delete'],
+                        'roles' => ['Adm-OplataDelete'],
+                    ],
+                    [
+                        'allow' => true,
+                        'actions' => ['delete-item'],
+                        'roles' => ['Adm-OplataDeleteItem'],
                     ],
                 ],
             ],
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
-                    'delete' => ['post', 'delete-item'],
+                    'delete' => ['post'],
+                    'delete-item' => ['post'],
                 ],
             ],
         ];
@@ -127,7 +149,6 @@ class TransactionController extends Controller
         /* @var $model \pavlinter\admoplata\models\OplataTransaction */
 
         $items = $model->getItems()->indexBy('id')->all();
-        //$items = Module::getInstance()->manager->createOplataItemQuery()->where(['oplata_transaction_id' => $id])->indexBy('id')->all();
         if (empty($items)) {
             $items[] = Module::getInstance()->manager->createOplataItem(['scenario' => 'multiFields']);
         } else {
@@ -144,6 +165,10 @@ class TransactionController extends Controller
             if ($loaded) {
 
                 if (ModelHelper::validate([$model, $items])) {
+                    $model->price = 0;
+                    foreach ($items as $item) {
+                        $model->price += $item->price * $item->amount;
+                    }
                     $model->save(false);
                     $newId = [];
                     foreach ($items as $oldId => $item) {
@@ -198,11 +223,19 @@ class TransactionController extends Controller
     {
         $id = Yii::$app->request->post('id');
         $model = Module::getInstance()->manager->createOplataItemQuery('findOne', $id);
+        /* @var $model \pavlinter\admoplata\models\OplataItem */
+        $json['r'] = 1;
         if ($model !== null) {
+            if ($model->transaction) {
+                $price = $model->price * $model->amount;
+                $model->transaction->price -= $price;
+                $model->transaction->save(false);
+                $json['price'] = Yii::$app->formatter->asDecimal($model->transaction->price, 2);
+            }
             $model->delete();
         }
         Yii::$app->response->format = Response::FORMAT_JSON;
-        return ['r' => 1];
+        return $json;
     }
 
     /**

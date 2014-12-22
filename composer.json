@@ -15,7 +15,8 @@
         }
     ],
     "require": {
-        "yiisoft/yii2": "*"
+        "yiisoft/yii2": "*",
+        "pavlinter/yii2-multifields": "@dev"
     },
     "autoload": {
         "psr-4": {

@@ -2,6 +2,7 @@
 
 namespace pavlinter\admoplata\models;
 
+use pavlinter\admoplata\Module;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\BaseActiveRecord;
@@ -156,7 +157,8 @@ class OplataTransaction extends \yii\db\ActiveRecord
      */
     public function getItems()
     {
-        return $this->hasMany(OplataItem::className(), ['oplata_transaction_id' => 'id']);
+
+        return $this->hasMany(Module::getInstance()->manager->createOplataItemQuery('className'), ['oplata_transaction_id' => 'id']);
     }
 
     /**
