@@ -113,9 +113,6 @@ $users = Adm::getInstance()->manager->createUserQuery()->all();
                             $row.show();
                         }
                     }'),
-                    'completeDelete' => new JsExpression('function(parent,form){
-
-                    }'),
                 ],
                 'templateFields' => '{title}{description}<div class="row"><div class="col-md-6">{price}</div><div class="col-md-6">{amount}</div></div>',
                 'template' => function($parentOptions, $closeButtonClass, $templateFields){ //default

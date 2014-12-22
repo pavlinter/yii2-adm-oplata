@@ -41,9 +41,14 @@ $this->params['breadcrumbs'][] = $this->title;
                 'hAlign' => 'center',
                 'format' => 'raw',
                 'value' => function ($model) {
-                    if (!$model->user_id) {
-                        return Yii::$app->formatter->asEmail($model->email);
+                    if ($model->user_id) {
+                        $res = Html::a('', ['/adm/user/update', 'id' => $model->user_id], [
+                            'class' => 'glyphicon glyphicon-eye-open',
+                        ]) . ' ';
+                        $res .= Yii::$app->formatter->asEmail($model->email);
+                        return $res;
                     }
+                    return Yii::$app->formatter->asEmail($model->email);
                 },
             ],
             [

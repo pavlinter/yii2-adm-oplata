@@ -102,6 +102,7 @@ class TransactionController extends Controller
                         $model->price += $item->price * $item->amount;
                     }
                     $model->save(false);
+
                     $newId = [];
                     foreach ($items as $oldId => $item) {
                         $item->oplata_transaction_id = $model->id;
@@ -169,6 +170,7 @@ class TransactionController extends Controller
                     foreach ($items as $item) {
                         $model->price += $item->price * $item->amount;
                     }
+
                     $model->save(false);
                     $newId = [];
                     foreach ($items as $oldId => $item) {

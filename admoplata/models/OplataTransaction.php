@@ -2,6 +2,7 @@
 
 namespace pavlinter\admoplata\models;
 
+use pavlinter\adm\Adm;
 use pavlinter\admoplata\Module;
 use Yii;
 use yii\behaviors\TimestampBehavior;
@@ -27,6 +28,7 @@ use yii\db\Expression;
  * @property string $created_at
  *
  * @property OplataItem[] $items
+ * @property User $user
  */
 class OplataTransaction extends \yii\db\ActiveRecord
 {
@@ -110,6 +112,11 @@ class OplataTransaction extends \yii\db\ActiveRecord
         if (in_array($this->scenario, ['admCreate', 'createOrder'])) {
             $this->alias = md5(serialize($this) . uniqid('oplata_', true));
         }
+        if (in_array($this->scenario, ['admCreate', 'createOrder', 'admUpdate'])) {
+            if ($this->user_id && $this->user) {
+                $this->email = $this->user->email;
+            }
+        }
         return parent::beforeSave($insert);
     }
 
@@ -159,6 +166,14 @@ class OplataTransaction extends \yii\db\ActiveRecord
     {
 
         return $this->hasMany(Module::getInstance()->manager->createOplataItemQuery('className'), ['oplata_transaction_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUser()
+    {
+        return $this->hasOne(Adm::getInstance()->manager->createUserQuery('className'), ['id' => 'user_id']);
     }
 
     /**

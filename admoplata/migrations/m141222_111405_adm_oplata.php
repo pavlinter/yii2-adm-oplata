@@ -31,6 +31,7 @@ class m141222_111405_adm_oplata extends Migration
 
         $this->createIndex('user_id', '{{%oplata_transaction}}', 'user_id');
         $this->createIndex('alias', '{{%oplata_transaction}}', 'alias');
+        $this->addForeignKey('oplata_transaction_ibfk_1', '{{%oplata_transaction}}', 'user_id', '{{%user}}', 'id', 'SET NULL', 'SET NULL');
 
         $this->createTable('{{%oplata_item}}', [
             'id' => Schema::TYPE_BIGPK,
