@@ -9,8 +9,10 @@ use pavlinter\adm\Adm;
 /* @var $searchModel app\models\OplataTransactionSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
+Yii::$app->i18n->disableDot();
 $this->title = Adm::t('oplata', 'Orders');
 $this->params['breadcrumbs'][] = $this->title;
+Yii::$app->i18n->resetDot();
 ?>
 <div class="oplata-transaction-index">
 
@@ -19,6 +21,8 @@ $this->params['breadcrumbs'][] = $this->title;
     <p>
         <?= Html::a(Adm::t('oplata', 'Create Order'), ['create'], ['class' => 'btn btn-primary']) ?>
     </p>
+
+    <?php Yii::$app->i18n->disableDot();?>
 
     <?= Adm::widget('GridView',[
         'dataProvider' => $dataProvider,
@@ -120,5 +124,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
         ],
     ]); ?>
+
+    <?php Yii::$app->i18n->resetDot();?>
 
 </div>

@@ -81,6 +81,7 @@ $users = Adm::getInstance()->manager->createUserQuery()->all();
                             <?= $form->field($model, 'payment_id')->textInput(['readonly' => true]) ?>
                         </div>
                     </div>
+
                 </section>
             </section>
         </div>
@@ -134,6 +135,8 @@ $users = Adm::getInstance()->manager->createUserQuery()->all();
 
         </div>
     </div>
+
+
 
     <div class="form-group">
         <div class="row">

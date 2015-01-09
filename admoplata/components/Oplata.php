@@ -67,8 +67,6 @@ class Oplata extends Component
         if ($this->password === null) {
             throw new InvalidConfigException('The "password" property must be set.');
         }
-
-        Yii::$app->getModule('adm'); // load module
     }
 
 

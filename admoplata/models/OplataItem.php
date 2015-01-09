@@ -57,11 +57,11 @@ class OplataItem extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('adm/oplata_item', 'ID'),
-            'oplata_transaction_id' => Yii::t('adm/oplata_item', 'Oplata Transaction ID'),
-            'title' => Yii::t('adm/oplata_item', 'Title'),
-            'description' => Yii::t('adm/oplata_item', 'Description'),
-            'price' => Yii::t('adm/oplata_item', 'Price'),
+            'id' => Yii::t('modelAdm/oplata_item', 'ID'),
+            'oplata_transaction_id' => Yii::t('modelAdm/oplata_item', 'Oplata Transaction ID'),
+            'title' => Yii::t('modelAdm/oplata_item', 'Title'),
+            'description' => Yii::t('modelAdm/oplata_item', 'Description'),
+            'price' => Yii::t('modelAdm/oplata_item', 'Price'),
         ];
     }
 

@@ -143,19 +143,19 @@ class OplataTransaction extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('adm/oplata_transaction', 'ID'),
-            'user_id' => Yii::t('adm/oplata_transaction', 'User'),
-            'email' => Yii::t('adm/oplata_transaction', 'Email'),
-            'payment_id' => Yii::t('adm/oplata_transaction', 'Payment'),
-            'price' => Yii::t('adm/oplata_transaction', 'Price'),
-            'shipping' => Yii::t('adm/oplata_transaction', 'Shipping'),
-            'currency' => Yii::t('adm/oplata_transaction', 'Currency'),
-            'order_status' => Yii::t('adm/oplata_transaction', 'Order Status'),
-            'response_status' => Yii::t('adm/oplata_transaction', 'Status'),
-            'data' => Yii::t('adm/oplata_transaction', 'Data'),
-            'response_data' => Yii::t('adm/oplata_transaction', 'Response Data'),
-            'alias' => Yii::t('adm/oplata_transaction', 'Alias'),
-            'created_at' => Yii::t('adm/oplata_transaction', 'Created'),
+            'id' => Yii::t('modelAdm/oplata_transaction', 'ID'),
+            'user_id' => Yii::t('modelAdm/oplata_transaction', 'User'),
+            'email' => Yii::t('modelAdm/oplata_transaction', 'Email'),
+            'payment_id' => Yii::t('modelAdm/oplata_transaction', 'Payment'),
+            'price' => Yii::t('modelAdm/oplata_transaction', 'Price'),
+            'shipping' => Yii::t('modelAdm/oplata_transaction', 'Shipping'),
+            'currency' => Yii::t('modelAdm/oplata_transaction', 'Currency'),
+            'order_status' => Yii::t('modelAdm/oplata_transaction', 'Order Status'),
+            'response_status' => Yii::t('modelAdm/oplata_transaction', 'Status'),
+            'data' => Yii::t('modelAdm/oplata_transaction', 'Data'),
+            'response_data' => Yii::t('modelAdm/oplata_transaction', 'Response Data'),
+            'alias' => Yii::t('modelAdmoplata_transaction', 'Alias'),
+            'created_at' => Yii::t('modelAdm/oplata_transaction', 'Created'),
         ];
     }
 
@@ -183,10 +183,10 @@ class OplataTransaction extends \yii\db\ActiveRecord
     public static function currency_list($currency = false)
     {
         $list = [
-            self::CURRENCY_EUR => Yii::t('adm/oplata_transaction', 'EUR'),
-            self::CURRENCY_USD => Yii::t('adm/oplata_transaction', 'USD'),
-            self::CURRENCY_RUB => Yii::t('adm/oplata_transaction', 'RUB'),
-            self::CURRENCY_UAH => Yii::t('adm/oplata_transaction', 'UAH'),
+            self::CURRENCY_EUR => Yii::t('modelAdm/oplata_transaction', 'EUR'),
+            self::CURRENCY_USD => Yii::t('modelAdm/oplata_transaction', 'USD'),
+            self::CURRENCY_RUB => Yii::t('modelAdm/oplata_transaction', 'RUB'),
+            self::CURRENCY_UAH => Yii::t('modelAdm/oplata_transaction', 'UAH'),
         ];
         if ($currency) {
             if (isset($list[$currency])) {
@@ -204,9 +204,9 @@ class OplataTransaction extends \yii\db\ActiveRecord
     public static function status_list($status = false)
     {
         $list = [
-            self::STATUS_NOT_PAID => Yii::t('adm/oplata_transaction', 'Not paid'),
-            self::STATUS_FAILURE => Yii::t('adm/oplata_transaction', 'Failure'),
-            self::STATUS_SUCCESS => Yii::t('adm/oplata_transaction', 'Success'),
+            self::STATUS_NOT_PAID => Yii::t('modelAdm/oplata_transaction', 'Not paid'),
+            self::STATUS_FAILURE => Yii::t('modelAdm/oplata_transaction', 'Failure'),
+            self::STATUS_SUCCESS => Yii::t('modelAdm/oplata_transaction', 'Success'),
         ];
         if ($status !== false) {
             if (isset($list[$status])) {
