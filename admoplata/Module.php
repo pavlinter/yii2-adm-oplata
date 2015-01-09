@@ -3,18 +3,20 @@
 namespace pavlinter\admoplata;
 
 use pavlinter\adm\Adm;
+use pavlinter\adm\AdmBootstrapInterface;
 use Yii;
-use yii\base\BootstrapInterface;
 use yii\helpers\ArrayHelper;
 
 /**
  * @property \pavlinter\admoplata\ModelManager $manager
  */
-class Module extends \yii\base\Module implements BootstrapInterface
+class Module extends \yii\base\Module implements AdmBootstrapInterface
 {
     public $controllerNamespace = 'pavlinter\admoplata\controllers';
 
     public $invoiceLayout = '/main';
+
+    public $layout = '@vendor/pavlinter/yii2-adm/adm/views/layouts/main';
 
     /**
      * @inheritdoc
@@ -38,15 +40,15 @@ class Module extends \yii\base\Module implements BootstrapInterface
         parent::init();
         // custom initialization code goes here
     }
+
     /**
-     * @inheritdoc
+     * @param \pavlinter\adm\Adm $adm
      */
-    public function bootstrap($adm)
+    public function loading($adm)
     {
-        /* @var $adm \pavlinter\adm\Adm */
-        if ($adm->user->can('Adm-Pages')) {
+        if ($adm->user->can('AdmRoot')) {
             $adm->params['left-menu']['admoplata'] = [
-                'label' => '<i class="fa fa-usd"></i><span>' . $adm::t('admoplata','Oplata') . '</span>',
+                'label' => '<i class="fa fa-usd"></i><span>' . $adm::t('menu','Oplata') . '</span>',
                 'url' => ['/' . $adm->id . '/admoplata/transaction/index'],
                 'visible' => $adm->user->can('Adm-OplataRead'),
             ];
@@ -58,7 +60,11 @@ class Module extends \yii\base\Module implements BootstrapInterface
      */
     public function beforeAction($action)
     {
-        OplataAsset::register(Yii::$app->getView());
+        if ($action->controller->id !== 'default') {
+            Adm::register(); //required load adm,if use adm layout
+            OplataAsset::register(Yii::$app->getView());
+        }
         return parent::beforeAction($action);
     }
+
 }

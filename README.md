@@ -19,13 +19,13 @@ https://www.oplata.com
     'adm' => [
         ...
         'modules' => [
-            'admoplata' => [
-               'class' => 'pavlinter\admoplata\Module',
-               'modules' => [],
-            ],
-            ...
+            'admoplata'
         ],
         ...
+    ],
+    'admoplata' => [
+       'class' => 'pavlinter\admoplata\Module',
+       'modules' => [],
     ],
     ...
 ],
