@@ -122,7 +122,7 @@ $users = Adm::getInstance()->manager->createUserQuery()->all();
                     <section class="panel">
                         <header class="panel-heading">
                             <?= Adm::t('oplata', 'Item') ?>
-                            <a href="javascript:void(0);" class="btn btn-white btn-xs <?= $closeButtonClass ?>"><i class="fa fa-trash-o text-muted"></i> <?= Adm::t('oplata', 'Remove') ?></a>
+                            <a href="javascript:void(0);" class="btn btn-white btn-xs <?= $closeButtonClass ?>"><i class="fa fa-trash-o text-muted"></i> <?= Adm::t('oplata', 'Remove', ['dot' => false]) ?></a>
                         </header>
                         <section class="panel-body">
                             <?= $templateFields ?>
@@ -141,12 +141,12 @@ $users = Adm::getInstance()->manager->createUserQuery()->all();
     <div class="form-group">
         <div class="row">
             <div class="col-xs-6">
-                <?= Html::submitButton($model->isNewRecord ? Adm::t('oplata', 'Create') : Adm::t('oplata', 'Update'), ['class' => 'btn btn-primary']) ?>
+                <?= Html::submitButton($model->isNewRecord ? Adm::t('oplata', 'Create', ['dot' => false]) : Adm::t('oplata', 'Update', ['dot' => false]), ['class' => 'btn btn-primary']) ?>
             </div>
             <div class="col-xs-6">
                 <a class="btn btn-s-md btn-white cloneBtn" href="javascript:void(0);">
                     <i class="fa fa-plus text"></i>
-                    <span class="text"><?= Adm::t('oplata', 'Add Item') ?></span>
+                    <span class="text"><?= Adm::t('oplata', 'Add Item', ['dot' => false]) ?></span>
                 </a>
             </div>
         </div>
