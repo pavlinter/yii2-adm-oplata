@@ -52,7 +52,7 @@ class Oplata extends Component
         'response_code',
         'card_type',
         'amount',
-        'sender_email'
+        'sender_email',
     ];
 
     private $items = [];
@@ -61,6 +61,8 @@ class Oplata extends Component
 
     public function init()
     {
+        $this->responseFields[] = Yii::$app->request->csrfParam;
+
         if ($this->merchantId === null) {
             throw new InvalidConfigException('The "merchantId" property must be set.');
         }

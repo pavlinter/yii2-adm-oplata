@@ -13,6 +13,15 @@ use yii\web\NotFoundHttpException;
 class DefaultController extends Controller
 {
     /**
+     * @inheritdoc
+     */
+    public function beforeAction($action)
+    {
+        $this->enableCsrfValidation = false;
+        return parent::beforeAction($action);
+    }
+
+    /**
      * @param $alias
      * @return string
      * @throws NotFoundHttpException
@@ -31,8 +40,12 @@ class DefaultController extends Controller
         ]);
     }
 
+    /**
+     * @return \yii\web\Response
+     */
     public function actionTest()
     {
+
 
         $item1 = new OplataItem();
         $item1->title = 'Item 1';
@@ -59,8 +72,7 @@ class DefaultController extends Controller
             'data' => [], //or string or object
         ]);
         if ($id !== false) {
-            exit('id - '.$id);
-            //return $this->redirect(['send', 'id' => $id]);
+            return $this->redirect(['send', 'id' => $id]);
         }
         exit('error: '.Yii::$app->oplata->getError());
     }
@@ -83,14 +95,15 @@ class DefaultController extends Controller
             'order_id' => $model->id,
             'order_desc' => $model->description,
             'currency' => $model->currency,
-            'amount' => $model->price + $model->shipping,
+            'amount' => ($model->price + $model->shipping) * 100,
             'merchant_id' => Yii::$app->oplata->merchantId,
-            'response_url' => Url::to(['response'], true),
-            'server_callback_url' => Url::to(['server'], true),
+            'response_url' => Url::to(['response', 'id' => $model->id], true),
+            'server_callback_url' => Url::to(['server', 'id' => $model->id], true),
         );
 
         $signature = Yii::$app->oplata->getSignature($request);
         $request['signature'] = $signature;
+
 
         return $this->render('send',[
             'model' => $model,
@@ -98,19 +111,23 @@ class DefaultController extends Controller
         ]);
     }
 
+
     /**
-     *
+     * @param $id
      */
-    public function actionResponse()
+    public function actionResponse($id)
     {
+        exit('hellow client');
         //client side
     }
 
+
     /**
-     *
+     * @param $id
      */
-    public function actionServer()
+    public function actionServer($id)
     {
+        ob_start();
         //server response
         $res = Yii::$app->oplata->checkPayment(Yii::$app->request->post());
         if (!$res) {
@@ -118,7 +135,11 @@ class DefaultController extends Controller
             echo '<pre>';
             echo print_r($errors);
             echo '</pre>';
+        } else {
+            echo 'success';
         }
+        $cont = ob_get_clean();
+        file_put_contents(Yii::getAlias('@app/runtime/oplata.txt'),$cont);
     }
 
 }
