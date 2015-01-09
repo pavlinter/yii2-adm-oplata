@@ -56,12 +56,15 @@ $this->title = Yii::t('adm/admoplata',"Invoice: #{id}", ['id' => $model->id, 'do
                             $total += $sum;
                         ?>
                         <tr>
-                            <td>
-                                <p><?= $item->description ?></p>
+                            <td class="admoplata-invoice-item">
+                                <div><?= $item->title ?></div>
+                                <?php if ($item->description) {?>
+                                    <p><?= $item->description ?></p>
+                                <?php }?>
                             </td>
-                            <td><?= $item->amount ?></td>
-                            <td><?= Yii::$app->oplata->price($item->price, $model->currency); ?></td>
-                            <td><?= Yii::$app->oplata->price($sum, $model->currency); ?></td>
+                            <td class="admoplata-invoice-amount"><?= $item->amount ?></td>
+                            <td class="admoplata-invoice-price"><?= Yii::$app->oplata->price($item->price, $model->currency); ?></td>
+                            <td class="admoplata-invoice-sum"><?= Yii::$app->oplata->price($sum, $model->currency); ?></td>
                         </tr>
                         <?php }?>
                     </tbody>

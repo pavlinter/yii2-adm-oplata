@@ -29,6 +29,15 @@ https://www.oplata.com
     ],
     ...
 ],
+'components' => [
+    ...
+    'oplata' => [
+        'class' => 'pavlinter\admoplata\components\Oplata',
+        'merchantId' => 'xxxx', //own merchant id
+        'password' => 'xxxx', //own password
+    ],
+    ...
+],
 ```
 
 Запустить миграцию
@@ -40,5 +49,5 @@ https://www.oplata.com
 Как использовать
 -------------
 ```php
-echo Html::a('My-Page',['adm/admoplata/default/invoice', 'alias' => 'My-hash']);
+echo Html::a('My-Page',['/admoplata/default/invoice', 'alias' => 'My-hash']);
 ```
