@@ -58,7 +58,7 @@ class DefaultController extends Controller
         $item2->description = 'Item 2Item 2Item 2Item 2Item 2';
         $item2->price = '0.9';
         $item2->amount = 2;
-        
+
         Yii::$app->oplata->clearItems();
         Yii::$app->oplata->addItem($item1);
         Yii::$app->oplata->addItem($item2);

@@ -15,8 +15,10 @@ class m141222_111405_adm_oplata extends Migration
         $this->createTable('{{%oplata_transaction}}', [
             'id' => Schema::TYPE_BIGPK,
             'user_id' => Schema::TYPE_INTEGER . " DEFAULT NULL",
+            'person' => Schema::TYPE_STRING . "(255) DEFAULT NULL",
             'email' => Schema::TYPE_STRING . "(255) DEFAULT NULL",
-            'description' => Schema::TYPE_STRING . "(1024) NOT NULL",
+            'title' => Schema::TYPE_STRING . "(1024) NOT NULL",
+            'description' => Schema::TYPE_TEXT,
             'payment_id' => Schema::TYPE_BIGINT . " DEFAULT NULL",
             'price' => Schema::TYPE_DECIMAL . "(7,2) NOT NULL",
             'shipping' => Schema::TYPE_DECIMAL . "(7,2) NOT NULL DEFAULT '0.00'",
