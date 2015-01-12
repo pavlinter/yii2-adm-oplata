@@ -6,12 +6,31 @@ use pavlinter\admoplata\models\OplataItem;
 use pavlinter\admoplata\models\OplataTransaction;
 use pavlinter\admoplata\Module;
 use Yii;
+use yii\filters\VerbFilter;
 use yii\helpers\Url;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 
+/**
+ * Class DefaultController
+ */
 class DefaultController extends Controller
 {
+    /**
+     * @inheritdoc
+     */
+    public function behaviors()
+    {
+        return [
+            'verbs' => [
+                'class' => VerbFilter::className(),
+                'actions' => [
+                    'response' => ['post'],
+                    'server' => ['post'],
+                ],
+            ],
+        ];
+    }
     /**
      * @inheritdoc
      */
@@ -96,7 +115,7 @@ class DefaultController extends Controller
             'currency' => $model->currency,
             'amount' => ($model->price + $model->shipping) * 100,
             'merchant_id' => Yii::$app->oplata->merchantId,
-            'response_url' => Url::to(['response', 'id' => $model->id], true),
+            'response_url' => Url::to(['response'], true),
             'server_callback_url' => Url::to(['server', 'id' => $model->id], true),
         );
 
@@ -119,10 +138,24 @@ class DefaultController extends Controller
     /**
      * @param $id
      */
-    public function actionResponse($id)
+    public function actionResponse()
     {
-        exit('hellow client');
+        echo '<pre>';
+        echo print_r(Yii::$app->request->post());
+        echo '</pre>';
+        exit();
         //client side
+        $model = Module::getInstance()->manager->createOplataTransactionQuery()->where(['alias' => $alias])->one();
+
+        if (!$model) {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+
+
+        return $this->render('response',[
+            'model' => $model,
+        ]);
+
     }
 
 
