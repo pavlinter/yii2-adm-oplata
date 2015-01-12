@@ -73,7 +73,16 @@ Yii::$app->i18n->resetDot();
                 'filter'=> Module::getInstance()->manager->createOplataTransactionQuery('status_list'),
                 'value' => function ($model) {
                     if (!empty($model->response_status)) {
-                        return Module::getInstance()->manager->createOplataTransactionQuery('status_list', $model->response_status);
+                        $text = Module::getInstance()->manager->createOplataTransactionQuery('status_list', $model->response_status);
+                        $class = '';
+                        if ($model->response_status === $model::STATUS_SUCCESS) {
+                            $class = 'text-success';
+                        } else if($model->response_status === $model::STATUS_FAILURE){
+                            $class = 'text-danger';
+                        }
+                        return Html::tag('span', $text, [
+                            'class' => $class,
+                        ]);
                     }
                 },
                 'filterWidgetOptions' => [
