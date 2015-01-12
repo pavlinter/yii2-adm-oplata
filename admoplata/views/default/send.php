@@ -20,33 +20,35 @@ $this->registerJs('
 
 ?>
 
-<?php if ($isPaid) {?>
+<div class="admoplata-send admoplata-container">
+    <?php if ($isPaid) {?>
 
-    <?php Alert::begin([
-        'closeButton' => false,
-        'options' => [
-             'class' => 'alert-success',
-         ],
-    ]) ?>
+        <?php Alert::begin([
+            'closeButton' => false,
+            'options' => [
+                 'class' => 'alert-success',
+             ],
+        ]) ?>
 
-    <?= Module::t('', "This {startLink}order{endLink} has already been paid!", [
-        'dot' => true,
-        'startLink' => Html::beginTag('a', ['href' => Url::to(['default/invoice', 'alias' => $model->alias])]),
-        'endLink' => Html::endTag('a'),
-    ]); ?>
+        <?= Module::t('', "This {startLink}order{endLink} has already been paid!", [
+            'dot' => true,
+            'startLink' => Html::beginTag('a', ['href' => Url::to(['default/invoice', 'alias' => $model->alias])]),
+            'endLink' => Html::endTag('a'),
+        ]); ?>
 
-    <?php Alert::end(); ?>
+        <?php Alert::end(); ?>
 
-<?php } else {?>
-    <?php $form = ActiveForm::begin([
-        'id' => 'returnform',
-        'action' => Yii::$app->oplata->url,
-    ]);?>
-        <?php
-            foreach ($request as $name => $value) {
-                echo Html::hiddenInput($name, $value);
-            }
-        ?>
-    <?php ActiveForm::end(); ?>
+    <?php } else {?>
+        <?php $form = ActiveForm::begin([
+            'id' => 'returnform',
+            'action' => Yii::$app->oplata->url,
+        ]);?>
+            <?php
+                foreach ($request as $name => $value) {
+                    echo Html::hiddenInput($name, $value);
+                }
+            ?>
+        <?php ActiveForm::end(); ?>
 
-<?php }?>
+    <?php }?>
+</div>

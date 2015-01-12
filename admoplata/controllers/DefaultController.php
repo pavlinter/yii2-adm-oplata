@@ -90,7 +90,7 @@ class DefaultController extends Controller
             'data' => [], //or string or object
         ]);
         if ($order !== false) {
-            return $this->redirect(['send', 'alias' => $order->alias]);
+            return $this->redirect(['invoice', 'alias' => $order->alias]);
         }
         exit('error: '.Yii::$app->oplata->getError());
     }
@@ -103,20 +103,22 @@ class DefaultController extends Controller
      */
     public function actionSend($alias)
     {
+        if (!$alias) {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
         $model = Module::getInstance()->manager->createOplataTransactionQuery()->where(['alias' => $alias])->one();
-
         if (!$model) {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
 
         $request = array(
             'order_id' => $model->id,
-            'order_desc' => $model->description,
+            'order_desc' => $model->title,
             'currency' => $model->currency,
             'amount' => ($model->price + $model->shipping) * 100,
             'merchant_id' => Yii::$app->oplata->merchantId,
             'response_url' => Url::to(['response'], true),
-            'server_callback_url' => Url::to(['server', 'id' => $model->id], true),
+            'server_callback_url' => Url::to(['server'], true),
         );
 
         if ($model->order_status === null) {
@@ -140,17 +142,12 @@ class DefaultController extends Controller
      */
     public function actionResponse()
     {
-        echo '<pre>';
-        echo print_r(Yii::$app->request->post());
-        echo '</pre>';
-        exit();
         //client side
-        $model = Module::getInstance()->manager->createOplataTransactionQuery()->where(['alias' => $alias])->one();
+        $model = Module::getInstance()->manager->createOplataTransactionQuery()->where(['id' => Yii::$app->request->post('order_id')])->one();
 
         if (!$model) {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
-
 
         return $this->render('response',[
             'model' => $model,
@@ -162,10 +159,10 @@ class DefaultController extends Controller
     /**
      * @param $id
      */
-    public function actionServer($id)
+    public function actionServer()
     {
-        ob_start();
         //server response
+        ob_start();
         $res = Yii::$app->oplata->checkPayment(Yii::$app->request->post());
         if (!$res) {
             $errors = Yii::$app->oplata->getErrors();

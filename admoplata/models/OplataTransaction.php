@@ -94,7 +94,7 @@ class OplataTransaction extends \yii\db\ActiveRecord
     public function scenarios()
     {
         $scenarios = parent::scenarios();
-        $scenarios['createOrder'] = ['user_id', 'email', 'shipping', 'data', 'description', 'currency'];
+        $scenarios['createOrder'] = ['user_id', 'email', 'shipping', 'data', 'title',  'description', 'currency'];
         $scenarios['admCreate'] = ['user_id', 'email', 'person', 'title', 'description', 'shipping', 'currency', 'response_status'];
         $scenarios['admUpdate'] = $scenarios['admCreate'];
 

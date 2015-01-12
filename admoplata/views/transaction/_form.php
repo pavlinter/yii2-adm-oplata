@@ -11,8 +11,19 @@ use pavlinter\adm\Adm;
 /* @var $this yii\web\View */
 /* @var $model pavlinter\admoplata\models\OplataTransaction */
 /* @var $form yii\widgets\ActiveForm */
+/* @var $userModel \pavlinter\adm\models\User */
 
-$users = Adm::getInstance()->manager->createUserQuery()->all();
+$userModel = Adm::getInstance()->manager->createUser();
+
+$attributes = $userModel->attributes();
+$var = '';
+foreach ($attributes as $attribute) {
+    if (in_array($attribute, ['auth_key', 'password_hash', 'password_reset_token', 'role', 'status'])) {
+        continue;
+    }
+    $var .= "{" . $attribute . "} - " . $userModel->getAttributeLabel($attribute) . "<br/>";
+}
+
 ?>
 
 <div class="oplata-transaction-form m-t-lg">
@@ -39,15 +50,43 @@ $users = Adm::getInstance()->manager->createUserQuery()->all();
                         </div>
 
                         <div class="col-sm-6">
-                            <?= $form->field($model, 'user_id')->widget(\kartik\widgets\Select2::classname(), [
-                                'data' => \yii\helpers\ArrayHelper::map($users, 'id', function ($data) {
-                                    return $data['username'] . ' - ' . $data['email'];
-                                }),
+                            <?php
+
+                            $url = Url::to(['user-list']);
+                            $initScript = <<< SCRIPT
+                            function (element, callback) {
+                                var id=\$(element).val();
+                                if (id !== "") {
+                                    \$.ajax("{$url}?id=" + id, {
+                                        dataType: "json"
+                                    }).done(function(data) { callback(data.results);});
+                                }
+                            }
+SCRIPT;
+                            echo $form->field($model, 'user_id')->widget(\kartik\widgets\Select2::classname(), [
                                 'options' => ['placeholder' => Adm::t('','Select ...', ['dot' => false])],
                                 'pluginOptions' => [
                                     'allowClear' => true,
-                                ]
+                                    'minimumInputLength' => 3,
+                                    'ajax' => [
+                                        'url' => $url,
+                                        'dataType' => 'json',
+                                        'data' => new JsExpression('function(term,page) { return {search:term}; }'),
+                                        'results' => new JsExpression('function(data,page) {
+                                            return {results:data.results}; }
+                                        '),
+                                    ],
+                                    'initSelection' => new JsExpression($initScript)
+                                ],
+                                'pluginEvents' => [
+                                    'change' => 'function(e) {
+                                        if(e.added){
+                                            $("#oplatatransaction-description").val(e.added.template);
+                                        }
+                                    }',
+                                ],
                             ]); ?>
+
                         </div>
                     </div>
 
@@ -62,7 +101,9 @@ $users = Adm::getInstance()->manager->createUserQuery()->all();
 
                     <div class="row">
                         <div class="col-sm-12">
-                            <?= $form->field($model, 'description')->textarea() ?>
+                            <?= $form->field($model, 'description',[
+                                'template' => "<a href=\"javascript:void(0);\" data-toggle=\"popover\" data-content=\"" . $var . "\" data-placement=\"top\" data-html=\"true\" class=\"fa fa-cog\"></a> {label} " . Adm::t('oplata', "Email - {email}\nUsername - {username}", ['dot' => '.', 'dotRedirect' => 0]) . "\n{input}\n{hint}\n{error}",
+                            ])->textarea() ?>
                         </div>
                     </div>
 

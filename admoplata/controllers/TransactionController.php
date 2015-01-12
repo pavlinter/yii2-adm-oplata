@@ -2,10 +2,13 @@
 
 namespace pavlinter\admoplata\controllers;
 
+use pavlinter\adm\Adm;
 use pavlinter\adm\filters\AccessControl;
 use pavlinter\admoplata\Module;
 use pavlinter\multifields\ModelHelper;
 use Yii;
+use yii\db\Query;
+use yii\helpers\Json;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -27,7 +30,7 @@ class TransactionController extends Controller
                 'rules' => [
                     [
                         'allow' => true,
-                        'actions' => ['index'],
+                        'actions' => ['index', 'user-list'],
                         'roles' => ['Adm-OplataRead'],
                     ],
                     [
@@ -172,6 +175,12 @@ class TransactionController extends Controller
                     }
                     $newId = [];
                     if ($model->order_status === null) {
+
+                        if ($model->user_id) {
+                            $model->person = null;
+                            $model->email = null;
+                        }
+
                         $model->save(false);
                         foreach ($items as $oldId => $item) {
                             $item->oplata_transaction_id = $model->id;
@@ -245,6 +254,52 @@ class TransactionController extends Controller
         }
         Yii::$app->response->format = Response::FORMAT_JSON;
         return $json;
+    }
+
+    /**
+     * @param null $search
+     * @param null $id
+     */
+    public function actionUserList($search = null, $id = null) {
+
+        $out = ['more' => false];
+        if (!is_null($search)) {
+            $userTable      = forward_static_call(array(Adm::getInstance()->manager->userClass, 'tableName'));
+            $query = new Query;
+            $query->from($userTable)
+                ->where('email LIKE "%' . $search .'%"')
+                ->limit(20);
+            $command = $query->createCommand();
+            $rows = $command->queryAll();
+            $results = [];
+            foreach ($rows as $row) {
+
+                $params = [];
+                foreach ($row as $attribute => $value) {
+                    if (in_array($attribute, ['auth_key', 'password_hash', 'password_reset_token', 'role', 'status'])) {
+                        continue;
+                    }
+                    $params[$attribute] = $value;
+                }
+                $params['dot'] = false;
+                $params['br']  = false;
+                $results[] = [
+                    'id' => $row['id'],
+                    'text' => $row['email'],
+                    'template' => Adm::t('oplata', "Email - {email}\nUsername - {username}", $params),
+                ];
+            }
+
+            $out['results'] = $results;
+        }
+        elseif ($id > 0) {
+            $model = Adm::getInstance()->manager->createUserQuery()->where(['id' => $id])->one();
+            $out['results'] = ['id' => $id, 'text' => $model->email];
+        }
+        else {
+            $out['results'] = ['id' => 0, 'text' => 'No matching records found'];
+        }
+        echo Json::encode($out);
     }
 
     /**

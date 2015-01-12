@@ -2,6 +2,7 @@
 
 use pavlinter\admoplata\models\OplataTransaction;
 use pavlinter\admoplata\Module;
+use yii\helpers\Url;
 
 /* @var $this yii\web\View */
 /* @var $model OplataTransaction */
@@ -11,7 +12,7 @@ $admoplata = Module::getInstance();
 $admoplata->layout = $admoplata->invoiceLayout;
 $this->title = Yii::t('adm/admoplata',"Invoice: #{id}, {title}", ['id' => $model->id, 'title' => $model->title, 'dot' => false]);
 ?>
-<div class="admoplata-invoice">
+<div class="admoplata-invoice admoplata-container">
 
     <div class="panel panel-default">
         <div class="panel-body">
@@ -27,14 +28,35 @@ $this->title = Yii::t('adm/admoplata',"Invoice: #{id}, {title}", ['id' => $model
 
                 <div class="col-sm-6 text-right">
                     <h4 class="text-primary"><?= Yii::t('adm/admoplata','Invoice No. {invoice-number}', ['invoice-number' => $model->id,'dot' => true]) ?></h4>
-                    <?php if ($model->email) {?>
-                        <p><?= Yii::t('adm/admoplata',"<strong>To:</strong> {email}", ['email' => $model->email, 'dot' => true]) ?></p>
-                    <?php }?>
-                    <p><?= Yii::t('adm/admoplata','<strong>Invoice Date:</strong> {date}', ['date' => Yii::$app->formatter->asDate($model->created_at), 'time' => Yii::$app->formatter->asTime($model->created_at),'nl2br' => false, 'dot' => true]) ?></p>
-                    <p><?= Yii::t('adm/admoplata','Status: ' . $model->response_status, ['dot' => true]) ?></p>
-                    <?= Yii::t('adm/admoplata','Status: ' . OplataTransaction::STATUS_NOT_PAID, ['dot' => '.']) ?>
-                    <?= Yii::t('adm/admoplata','Status: ' . OplataTransaction::STATUS_SUCCESS, ['dot' => '.']) ?>
-                    <?= Yii::t('adm/admoplata','Status: ' . OplataTransaction::STATUS_FAILURE, ['dot' => '.']) ?>
+                    <div>
+                        <?php if ($model->user_id) {?>
+                            <?= Yii::t('adm/admoplata',"To: {email}\nInvoice Date: {date}\nStatus: {status}\n{description}", [
+                                'email' => $model->email,
+                                'date' => Yii::$app->formatter->asDate($model->created_at),
+                                'time' => Yii::$app->formatter->asTime($model->created_at),
+                                'status' => $model::status_list($model->response_status),
+                                'description' => nl2br($model->description),
+                                'dot' => false,
+                            ]); ?>
+                        <?php } else {?>
+                            <?= Yii::t('adm/admoplata',"To: {person}\nEmail: {email}\nInvoice Date: {date}\nStatus: {status}\n{description}", [
+                                'person' => $model->person,
+                                'email' => $model->email,
+                                'date' => Yii::$app->formatter->asDate($model->created_at),
+                                'time' => Yii::$app->formatter->asTime($model->created_at),
+                                'status' => $model::status_list($model->response_status),
+                                'description' => nl2br($model->description),
+                                'dot' => false,
+                            ]); ?>
+                        <?php }?>
+
+                        <?= Yii::t('adm/admoplata',"To: {email}\nInvoice Date: {date}\nStatus: {status}\n{description}", [
+                            'dot' => '.',
+                        ]); ?>
+                        <?= Yii::t('adm/admoplata',"To: {person}\nEmail: {email}\nInvoice Date: {date}\nStatus: {status}\n{description}", [
+                            'dot' => '.',
+                        ]); ?>
+                    </div>
                 </div>
             </div><!-- row -->
 
@@ -90,7 +112,7 @@ $this->title = Yii::t('adm/admoplata',"Invoice: #{id}, {title}", ['id' => $model
 
             <div class="text-right btn-invoice clearfix">
                 <?php if ($model->response_status === OplataTransaction::STATUS_NOT_PAID) {?>
-                    <button class="btn btn-primary btn-lg mr5"><i class="fa fa-dollar mr5"></i> <?= Yii::t('adm/admoplata','Make A Payment', ['dot' => false]) ?></button>
+                <a href="<?= Url::to(['send', 'alias' => $model->alias]) ?>" class="btn btn-primary btn-lg mr5"><i class="fa fa-dollar mr5"></i> <?= Yii::t('adm/admoplata','Make A Payment', ['dot' => false]) ?></a>
                     <div class="mb30"></div>
                 <?php }?>
                 <?= Yii::t('adm/admoplata','Make A Payment', ['dot' => '.']) ?>

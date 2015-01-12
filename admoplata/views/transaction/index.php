@@ -20,7 +20,7 @@ Yii::$app->i18n->resetDot();
     <h1><?= Html::encode($this->title) ?></h1>
 
     <p>
-        <?= Html::a(Adm::t('oplata', 'Create Order'), ['create'], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a(Adm::t('oplata', 'Create Order', ['dot' => true]), ['create'], ['class' => 'btn btn-primary']) ?>
     </p>
 
     <?php Yii::$app->i18n->disableDot();?>
@@ -132,13 +132,13 @@ Yii::$app->i18n->resetDot();
                         ]);
                     },
                     'pay' => function ($url, $model) {
-                        if ($model->order_status === null) {
+                        if ($model->alias) {
                             return Html::a(null, 'javascript:void(0);', [
-                                'class' => 'fa fa-link btn-link',
+                                'class' => 'fa fa-link',
                                 'data-pjax' => '0',
                                 'data-toggle' => 'popover',
                                 'data-placement' => 'top',
-                                'data-content' => Url::to(['default/send', 'alias' => $model->alias] , true),
+                                'data-content' => Url::to(['default/invoice', 'alias' => $model->alias] , true),
                             ]);
                         }
                     },
