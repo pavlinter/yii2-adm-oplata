@@ -262,15 +262,18 @@ class TransactionController extends Controller
      */
     public function actionUserList($search = null, $id = null) {
 
+        $viewCallback = Module::getInstance()->userSelect['viewCallback'];
+        $querySearch = Module::getInstance()->userSelect['querySearch'];
+        $queryLoad = Module::getInstance()->userSelect['queryLoad'];
+
+
+        $userTable      = forward_static_call(array(Adm::getInstance()->manager->userClass, 'tableName'));
         $out = ['more' => false];
+
         if (!is_null($search)) {
-            $userTable      = forward_static_call(array(Adm::getInstance()->manager->userClass, 'tableName'));
-            $query = new Query;
-            $query->from($userTable)
-                ->where('email LIKE "%' . $search .'%"')
-                ->limit(20);
-            $command = $query->createCommand();
-            $rows = $command->queryAll();
+
+            $rows = $querySearch($userTable, $search);
+
             $results = [];
             foreach ($rows as $row) {
 
@@ -285,16 +288,16 @@ class TransactionController extends Controller
                 $params['br']  = false;
                 $results[] = [
                     'id' => $row['id'],
-                    'text' => $row['email'],
-                    'template' => Adm::t('oplata', "Email - {email}\nUsername - {username}", $params),
+                    'text' => $viewCallback($row),
+                    'template' => Adm::t('oplata', "Email - {email} Username - {username}", $params),
                 ];
             }
 
             $out['results'] = $results;
         }
         elseif ($id > 0) {
-            $model = Adm::getInstance()->manager->createUserQuery()->where(['id' => $id])->one();
-            $out['results'] = ['id' => $id, 'text' => $model->email];
+            $row = $queryLoad($userTable, $id);
+            $out['results'] = ['id' => $id, 'text' => $viewCallback($row)];
         }
         else {
             $out['results'] = ['id' => 0, 'text' => 'No matching records found'];

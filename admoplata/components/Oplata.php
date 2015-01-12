@@ -120,30 +120,30 @@ class Oplata extends Component
             $order_id = null;
         }
         if (!$order_id) {
-            $this->setError('An error has occurred during payment. Please contact us to ensure your order has submitted.');
+            $this->setError('Error 1: #{order_id}, status: {order_status}', $response);
             return false;
         }
 
         $order = Module::getInstance()->manager->createOplataTransactionQuery()->where(['id' => $order_id])->one();
 
         if (!$order) {
-            $this->setError('An error has occurred during payment. Please contact us to ensure your order has submitted.');
+            $this->setError('Error 2: #{order_id}, status: {order_status}', $response);
             return false;
         }
 
         if ($this->merchantId != $response['merchant_id']) {
-            $this->setError('An error has occurred during payment. Merchant data is incorrect.');
+            $this->setError('Error 3: #{order_id}, status: {order_status}', $response);
             return false;
         }
 
 
         if ($this->getSignature($response) != $responseSignature) {
-            $this->setError('An error has occurred during payment. Signature is not valid.');
+            $this->setError('Error 4: #{order_id}, status: {order_status}', $response);
             return false;
         }
 
         if ($response['order_status'] == self::ORDER_DECLINED) {
-            $this->setError("Thank you for shopping with us. However, the transaction has been declined.");
+            $this->setError('Error 5: #{order_id}, status: {order_status}', $response);
             return false;
         }
 
@@ -153,8 +153,11 @@ class Oplata extends Component
             $order->response_status = $response['response_status'];
             $order->response_data = $data;
             if (!$order->save(false)) {
+                $this->setError('Error 6: #{order_id}, status: {order_status}', $response);
                 return false;
             }
+        } else {
+            $this->setError('Error 7: #{order_id}, status: {order_status}', $response);
         }
         return true;
     }
@@ -177,7 +180,7 @@ class Oplata extends Component
         foreach ($items as $item) {
             /* @var $item \pavlinter\admoplata\models\OplataItem */
             if (!$item->validate()) {
-                $this->setError(reset($item->getErrors()));
+                $this->setError(reset($item->getErrors()), false);
                 return false;
             }
             $price += $item->price * $item->amount;
@@ -196,7 +199,7 @@ class Oplata extends Component
             }
             return $order;
         }
-        $this->setError(reset($order->getErrors()));
+        $this->setError(reset($order->getErrors()), false);
         return false;
     }
 
@@ -249,9 +252,16 @@ class Oplata extends Component
     /**
      * @param $msg
      */
-    public function setError($msg)
+    public function setError($msg, $param = [])
     {
-        $this->errors[] = $msg;
+        if ($param === false) {
+            $this->errors[] = $msg;
+        }
+
+        if (!isset($params['dot'])) {
+            $params['dot'] = false;
+        }
+        $this->errors[] = Yii::t('admoplata/server_errors', $msg, $params);
     }
     /**
      * @return mixed

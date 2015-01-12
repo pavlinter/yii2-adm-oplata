@@ -2,6 +2,7 @@
 
 namespace pavlinter\admoplata\controllers;
 
+use pavlinter\admoplata\components\Oplata;
 use pavlinter\admoplata\models\OplataItem;
 use pavlinter\admoplata\models\OplataTransaction;
 use pavlinter\admoplata\Module;
@@ -64,8 +65,6 @@ class DefaultController extends Controller
      */
     public function actionTest()
     {
-
-
         $item1 = new OplataItem();
         $item1->title = 'Item 1';
         $item1->description = 'Item 1Item 1Item 1Item 1Item 1';
@@ -110,9 +109,13 @@ class DefaultController extends Controller
         if (!$model) {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
+        
+        if ($model->order_status !== null) {
+            return $this->redirect(['invoice', 'alias' => $model->alias]);
+        }
 
         $request = array(
-            'order_id' => $model->id,
+            'order_id' => $model->id . Oplata::ORDER_SEPARATOR . time(),
             'order_desc' => $model->title,
             'currency' => $model->currency,
             'amount' => ($model->price + $model->shipping) * 100,
@@ -143,7 +146,8 @@ class DefaultController extends Controller
     public function actionResponse()
     {
         //client side
-        $model = Module::getInstance()->manager->createOplataTransactionQuery()->where(['id' => Yii::$app->request->post('order_id')])->one();
+        list($order_id,) = explode(Oplata::ORDER_SEPARATOR, Yii::$app->request->post('order_id'));
+        $model = Module::getInstance()->manager->createOplataTransactionQuery()->where(['id' => $order_id])->one();
 
         if (!$model) {
             throw new NotFoundHttpException('The requested page does not exist.');
@@ -162,18 +166,14 @@ class DefaultController extends Controller
     public function actionServer()
     {
         //server response
-        ob_start();
         $res = Yii::$app->oplata->checkPayment(Yii::$app->request->post());
         if (!$res) {
             $errors = Yii::$app->oplata->getErrors();
-            echo '<pre>';
-            echo print_r($errors);
-            echo '</pre>';
-        } else {
-            echo 'success';
+            foreach ($errors as $error) {
+                Yii::warning($error, 'admoplata');
+                echo $error;
+            }
         }
-        $cont = ob_get_clean();
-        file_put_contents(Yii::getAlias('@app/runtime/oplata.txt'),$cont);
     }
 
 }

@@ -21,7 +21,7 @@ $this->title = Yii::t('adm/admoplata',"Invoice: #{id}, {title}", ['id' => $model
 
                     <h5 class="lg-title mb10"><?= Yii::t('adm/admoplata','From', ['dot' => true]) ?></h5>
                     <address>
-                        <?= Yii::t('adm/admoplata',"<strong>Web Services, Inc.</strong>\n795 Folsom Ave, Suite 600\n<abbr>P:</abbr> (123) 000-000", ['dot' => true]) ?>
+                        <?= Yii::t('adm/admoplata',"<strong>Web Services, Inc.</strong><br/>795 Folsom Ave, Suite 600<br/><abbr>P:</abbr> (123) 000-000", ['dot' => true]) ?>
                     </address>
 
                 </div><!-- col-sm-6 -->
@@ -30,7 +30,7 @@ $this->title = Yii::t('adm/admoplata',"Invoice: #{id}, {title}", ['id' => $model
                     <h4 class="text-primary"><?= Yii::t('adm/admoplata','Invoice No. {invoice-number}', ['invoice-number' => $model->id,'dot' => true]) ?></h4>
                     <div>
                         <?php if ($model->user_id) {?>
-                            <?= Yii::t('adm/admoplata',"To: {email}\nInvoice Date: {date}\nStatus: {status}\n{description}", [
+                            <?= Yii::t('adm/admoplata',"To: {email}<br/>Invoice Date: {date}<br/>Status: {status}<br/>{description}", [
                                 'email' => $model->email,
                                 'date' => Yii::$app->formatter->asDate($model->created_at),
                                 'time' => Yii::$app->formatter->asTime($model->created_at),
@@ -39,7 +39,7 @@ $this->title = Yii::t('adm/admoplata',"Invoice: #{id}, {title}", ['id' => $model
                                 'dot' => false,
                             ]); ?>
                         <?php } else {?>
-                            <?= Yii::t('adm/admoplata',"To: {person}\nEmail: {email}\nInvoice Date: {date}\nStatus: {status}\n{description}", [
+                            <?= Yii::t('adm/admoplata',"To: {person}<br/>Email: {email}<br/>Invoice Date: {date}<br/>Status: {status}<br/>{description}", [
                                 'person' => $model->person,
                                 'email' => $model->email,
                                 'date' => Yii::$app->formatter->asDate($model->created_at),
@@ -50,10 +50,10 @@ $this->title = Yii::t('adm/admoplata',"Invoice: #{id}, {title}", ['id' => $model
                             ]); ?>
                         <?php }?>
 
-                        <?= Yii::t('adm/admoplata',"To: {email}\nInvoice Date: {date}\nStatus: {status}\n{description}", [
+                        <?= Yii::t('adm/admoplata',"To: {email}<br/>Invoice Date: {date}<br/>Status: {status}<br/>{description}", [
                             'dot' => '.',
                         ]); ?>
-                        <?= Yii::t('adm/admoplata',"To: {person}\nEmail: {email}\nInvoice Date: {date}\nStatus: {status}\n{description}", [
+                        <?= Yii::t('adm/admoplata',"To: {person}<br/>Email: {email}<br/>Invoice Date: {date}<br/>Status: {status}<br/>{description}", [
                             'dot' => '.',
                         ]); ?>
                     </div>

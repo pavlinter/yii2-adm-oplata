@@ -102,7 +102,7 @@ SCRIPT;
                     <div class="row">
                         <div class="col-sm-12">
                             <?= $form->field($model, 'description',[
-                                'template' => "<a href=\"javascript:void(0);\" data-toggle=\"popover\" data-content=\"" . $var . "\" data-placement=\"top\" data-html=\"true\" class=\"fa fa-cog\"></a> {label} " . Adm::t('oplata', "Email - {email}\nUsername - {username}", ['dot' => '.', 'dotRedirect' => 0]) . "\n{input}\n{hint}\n{error}",
+                                'template' => "<a href=\"javascript:void(0);\" data-toggle=\"popover\" data-content=\"" . $var . "\" data-placement=\"top\" data-html=\"true\" class=\"fa fa-cog\"></a> {label} " . Adm::t('oplata', "Email - {email} Username - {username}", ['dot' => '.', 'dotRedirect' => 0]) . "\n{input}\n{hint}\n{error}",
                             ])->textarea() ?>
                         </div>
                     </div>
