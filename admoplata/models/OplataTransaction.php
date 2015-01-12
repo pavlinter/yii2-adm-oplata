@@ -14,7 +14,9 @@ use yii\db\Expression;
  *
  * @property string $id
  * @property integer $user_id
+ * @property string $person
  * @property string $email
+ * @property string $title
  * @property string $description
  * @property string $payment_id
  * @property string $price
@@ -72,15 +74,16 @@ class OplataTransaction extends \yii\db\ActiveRecord
     {
         return [
             [['user_id', 'payment_id'], 'integer'],
-            [['price', 'currency','response_status', 'alias', 'description'], 'required'],
+            [['price', 'currency','response_status', 'alias', 'title'], 'required'],
             [['price', 'shipping'], 'double'],
             [['email'], 'email'],
             [['currency'], 'in', 'range' => array_keys(self::currency_list())],
             [['response_status'], 'in', 'range' => array_keys(self::status_list())],
             [['data', 'response_data'], 'safe'],
             [['order_status', 'response_status'], 'string', 'max' => 50],
-            [['description'], 'string', 'max' => 1024],
-            [['email'], 'string', 'max' => 255],
+            [['title'], 'string', 'max' => 1024],
+            [['description'], 'string'],
+            [['email', 'person'], 'string', 'max' => 255],
             [['alias'], 'string', 'max' => 32],
         ];
     }
@@ -92,7 +95,7 @@ class OplataTransaction extends \yii\db\ActiveRecord
     {
         $scenarios = parent::scenarios();
         $scenarios['createOrder'] = ['user_id', 'email', 'shipping', 'data', 'description', 'currency'];
-        $scenarios['admCreate'] = ['user_id', 'email', 'shipping', 'description', 'currency', 'response_status'];
+        $scenarios['admCreate'] = ['user_id', 'email', 'person', 'title', 'description', 'shipping', 'currency', 'response_status'];
         $scenarios['admUpdate'] = $scenarios['admCreate'];
 
         return $scenarios;
@@ -145,7 +148,10 @@ class OplataTransaction extends \yii\db\ActiveRecord
         return [
             'id' => Yii::t('modelAdm/oplata_transaction', 'ID'),
             'user_id' => Yii::t('modelAdm/oplata_transaction', 'User'),
+            'person' => Yii::t('modelAdm/oplata_transaction', 'Person'),
             'email' => Yii::t('modelAdm/oplata_transaction', 'Email'),
+            'title' => Yii::t('modelAdm/oplata_transaction', 'Title'),
+            'description' => Yii::t('modelAdm/oplata_transaction', 'Description'),
             'payment_id' => Yii::t('modelAdm/oplata_transaction', 'Payment'),
             'price' => Yii::t('modelAdm/oplata_transaction', 'Price'),
             'shipping' => Yii::t('modelAdm/oplata_transaction', 'Shipping'),
