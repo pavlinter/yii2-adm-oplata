@@ -159,10 +159,9 @@ class Oplata extends Component
         return true;
     }
 
-
     /**
      * @param $data
-     * @return bool|string
+     * @return bool|\pavlinter\admoplata\models\OplataItem|OplataTransaction
      */
     public function createOrder($data)
     {
@@ -195,7 +194,7 @@ class Oplata extends Component
             foreach ($items as $item) {
                 $order->link('items', $item);
             }
-            return $order->id;
+            return $order;
         }
         $this->setError(reset($order->getErrors()));
         return false;

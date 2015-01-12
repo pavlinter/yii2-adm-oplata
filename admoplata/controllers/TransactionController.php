@@ -170,16 +170,17 @@ class TransactionController extends Controller
                     foreach ($items as $item) {
                         $model->price += $item->price * $item->amount;
                     }
-
-                    $model->save(false);
                     $newId = [];
-                    foreach ($items as $oldId => $item) {
-                        $item->oplata_transaction_id = $model->id;
-                        $item->save(false);
-                        ModelHelper::ajaxChangeField($newId, $item, 'title', $oldId);
-                        ModelHelper::ajaxChangeField($newId, $item, 'description', $oldId);
-                        ModelHelper::ajaxChangeField($newId, $item, 'amount', $oldId);
-                        ModelHelper::ajaxChangeField($newId, $item, 'price', $oldId);
+                    if ($model->order_status === null) {
+                        $model->save(false);
+                        foreach ($items as $oldId => $item) {
+                            $item->oplata_transaction_id = $model->id;
+                            $item->save(false);
+                            ModelHelper::ajaxChangeField($newId, $item, 'title', $oldId);
+                            ModelHelper::ajaxChangeField($newId, $item, 'description', $oldId);
+                            ModelHelper::ajaxChangeField($newId, $item, 'amount', $oldId);
+                            ModelHelper::ajaxChangeField($newId, $item, 'price', $oldId);
+                        }
                     }
 
                     if (Yii::$app->request->isAjax) {
@@ -229,12 +230,18 @@ class TransactionController extends Controller
         $json['r'] = 1;
         if ($model !== null) {
             if ($model->transaction) {
-                $price = $model->price * $model->amount;
-                $model->transaction->price -= $price;
-                $model->transaction->save(false);
+                if ($model->transaction->order_status === null) {
+                    $price = $model->price * $model->amount;
+                    $model->transaction->price -= $price;
+                    $model->transaction->save(false);
+                    $model->delete();
+                } else {
+                    $json['r'] = 0;
+                }
                 $json['price'] = Yii::$app->formatter->asDecimal($model->transaction->price, 2);
+            } else {
+                $model->delete();
             }
-            $model->delete();
         }
         Yii::$app->response->format = Response::FORMAT_JSON;
         return $json;

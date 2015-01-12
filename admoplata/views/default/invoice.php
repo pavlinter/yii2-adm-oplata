@@ -9,7 +9,7 @@ use pavlinter\admoplata\Module;
 $admoplata = Module::getInstance();
 
 $admoplata->layout = $admoplata->invoiceLayout;
-$this->title = Yii::t('adm/admoplata',"Invoice: #{id}", ['id' => $model->id, 'dot' => false]);
+$this->title = Yii::t('adm/admoplata',"Invoice: #{id}, {title}", ['id' => $model->id, 'title' => $model->title, 'dot' => false]);
 ?>
 <div class="admoplata-invoice">
 

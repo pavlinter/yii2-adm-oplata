@@ -62,7 +62,7 @@ class DefaultController extends Controller
         Yii::$app->oplata->clearItems();
         Yii::$app->oplata->addItem($item1);
         Yii::$app->oplata->addItem($item2);
-        $id = Yii::$app->oplata->createOrder([
+        $order = Yii::$app->oplata->createOrder([
             'user_id' => null,
             'email' => 'ttt@ttt.lv',
             'title' => 'Тестовый заказ',
@@ -70,8 +70,8 @@ class DefaultController extends Controller
             'shipping' => '0.89',
             'data' => [], //or string or object
         ]);
-        if ($id !== false) {
-            return $this->redirect(['send', 'id' => $id]);
+        if ($order !== false) {
+            return $this->redirect(['send', 'alias' => $order->alias]);
         }
         exit('error: '.Yii::$app->oplata->getError());
     }
@@ -82,9 +82,9 @@ class DefaultController extends Controller
      * @return string
      * @throws NotFoundHttpException
      */
-    public function actionSend($id)
+    public function actionSend($alias)
     {
-        $model = Module::getInstance()->manager->createOplataTransactionQuery()->where(['id' => $id])->one();
+        $model = Module::getInstance()->manager->createOplataTransactionQuery()->where(['alias' => $alias])->one();
 
         if (!$model) {
             throw new NotFoundHttpException('The requested page does not exist.');
@@ -100,13 +100,18 @@ class DefaultController extends Controller
             'server_callback_url' => Url::to(['server', 'id' => $model->id], true),
         );
 
-        $signature = Yii::$app->oplata->getSignature($request);
-        $request['signature'] = $signature;
-
+        if ($model->order_status === null) {
+            $signature = Yii::$app->oplata->getSignature($request);
+            $request['signature'] = $signature;
+            $isPaid = false;
+        } else {
+            $isPaid = true;
+        }
 
         return $this->render('send',[
             'model' => $model,
             'request' => $request,
+            'isPaid' => $isPaid,
         ]);
     }
 

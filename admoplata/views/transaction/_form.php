@@ -150,7 +150,7 @@ $users = Adm::getInstance()->manager->createUserQuery()->all();
     <div class="form-group">
         <div class="row">
             <div class="col-xs-6">
-                <?= Html::submitButton($model->isNewRecord ? Adm::t('oplata', 'Create', ['dot' => false]) : Adm::t('oplata', 'Update', ['dot' => false]), ['class' => 'btn btn-primary']) ?>
+                <?= Html::submitButton($model->isNewRecord ? Adm::t('oplata', 'Create', ['dot' => false]) : Adm::t('oplata', 'Update', ['dot' => false]), ['class' => 'btn btn-primary btnAct']) ?>
             </div>
             <div class="col-xs-6">
                 <a class="btn btn-s-md btn-white cloneBtn" href="javascript:void(0);">
@@ -169,6 +169,12 @@ $users = Adm::getInstance()->manager->createUserQuery()->all();
 <?php
 
 $this->registerJs('
+    var disabledUpdate = ' . (!$model->isNewRecord && $model->order_status !== null ? 'true' : 'false') . ';
+    if(disabledUpdate){
+        $("#order-form").find(":input").prop("readonly",true);
+        $(".mf-btn-close,.cloneBtn,.btnAct").hide();
+    }
+
     $("#oplatatransaction-user_id").on("select2-selecting", function(e){
         $("#oplatatransaction-email,#oplatatransaction-person").prop("disabled",true);
     }).on("select2-removed", function(e){
@@ -178,27 +184,30 @@ $this->registerJs('
         $("#oplatatransaction-email,#oplatatransaction-person").prop("disabled",true);
     }
 
-    $("#order-form").on("beforeSubmit",function(e){
-        var $form = $(this);
-        jQuery.ajax({
-                url: $form.attr("action"),
-                type: "POST",
-                dataType: "json",
-                data: $form.serialize(),
-                success: function(d) {
-                    if(d.r) {
-                        location.href = "' . Url::to(['index']) . '";
-                    } else {
-                        $form.trigger("updateErrors",[d.errors]).trigger("scrollToError");
-                    }
-                },
-            });
-        return false;
-    });
+    if(!disabledUpdate){
+        $("#order-form").on("beforeSubmit",function(e){
+            var $form = $(this);
+            jQuery.ajax({
+                    url: $form.attr("action"),
+                    type: "POST",
+                    dataType: "json",
+                    data: $form.serialize(),
+                    success: function(d) {
+                        if(d.r) {
+                            location.href = "' . Url::to(['index']) . '";
+                        } else {
+                            $form.trigger("updateErrors",[d.errors]).trigger("scrollToError");
+                        }
+                    },
+                });
+            return false;
+        });
 
-    $(".cloneBtn").on("afterAppend.mf", function(e,clone,settings){
-        $("html, body").animate({
-            scrollTop: $("." + settings.parentClass + ":last").offset().top
-        }, 1000);
-    });
+        $(".cloneBtn").on("afterAppend.mf", function(e,clone,settings){
+            $("html, body").animate({
+                scrollTop: $("." + settings.parentClass + ":last").offset().top
+            }, 1000);
+        });
+
+    }
 ');

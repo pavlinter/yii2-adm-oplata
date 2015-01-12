@@ -4,6 +4,7 @@ use kartik\grid\GridView;
 use pavlinter\admoplata\Module;
 use yii\helpers\Html;
 use pavlinter\adm\Adm;
+use yii\helpers\Url;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\OplataTransactionSearch */
@@ -90,6 +91,7 @@ Yii::$app->i18n->resetDot();
             [
                 'class' => '\kartik\grid\ActionColumn',
                 'width' => '130px',
+                'template' => '{pay} {view} {update} {delete}',
                 'buttons' => [
                     'view' => function ($url, $model) {
                         if ($model->alias) {
@@ -119,6 +121,17 @@ Yii::$app->i18n->resetDot();
                             'data-method' => 'post',
                             'data-pjax' => '0',
                         ]);
+                    },
+                    'pay' => function ($url, $model) {
+                        if ($model->order_status === null) {
+                            return Html::a(null, 'javascript:void(0);', [
+                                'class' => 'fa fa-link btn-link',
+                                'data-pjax' => '0',
+                                'data-toggle' => 'popover',
+                                'data-placement' => 'top',
+                                'data-content' => Url::to(['default/send', 'alias' => $model->alias] , true),
+                            ]);
+                        }
                     },
                 ],
             ],

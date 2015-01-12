@@ -46,7 +46,7 @@ class Module extends \yii\base\Module implements AdmBootstrapInterface
      */
     public function loading($adm)
     {
-        if ($adm->user->can('AdmRoot')) {
+        if ($adm->user->can('Adm-OplataRead')) {
             $adm->params['left-menu']['admoplata'] = [
                 'label' => '<i class="fa fa-usd"></i><span>' . $adm::t('menu','Oplata') . '</span>',
                 'url' => ['/admoplata/transaction/index'],
@@ -62,9 +62,40 @@ class Module extends \yii\base\Module implements AdmBootstrapInterface
     {
         if ($action->controller->id !== 'default') {
             Adm::register(); //required load adm,if use adm layout
-            OplataAsset::register(Yii::$app->getView());
         }
+        OplataAsset::register(Yii::$app->getView());
         return parent::beforeAction($action);
+    }
+
+    /**
+     *
+     */
+    public function registerTranslations()
+    {
+        if (!isset(Yii::$app->i18n->translations['admoplata*'])) {
+            Yii::$app->i18n->translations['admoplata*'] = [
+                'class' => 'pavlinter\translation\DbMessageSource',
+                'forceTranslation' => true,
+                'autoInsert' => true,
+                'dotMode' => true,
+            ];
+        }
+    }
+    /**
+     * @param $category
+     * @param $message
+     * @param array $params
+     * @param null $language
+     * @return string
+     */
+    public static function t($category, $message, $params = [], $language = null)
+    {
+        if ($category) {
+            $category = 'admoplata/' . $category;
+        } else {
+            $category = 'admoplata';
+        }
+        return Yii::t($category, $message, $params, $language);
     }
 
 }
