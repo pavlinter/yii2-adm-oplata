@@ -34,7 +34,11 @@ $users = Adm::getInstance()->manager->createUserQuery()->all();
                 <section class="panel-body">
 
                     <div class="row">
-                        <div class="col-sm-12">
+                        <div class="col-sm-6">
+                            <?= $form->field($model, 'title')->textInput() ?>
+                        </div>
+
+                        <div class="col-sm-6">
                             <?= $form->field($model, 'user_id')->widget(\kartik\widgets\Select2::classname(), [
                                 'data' => \yii\helpers\ArrayHelper::map($users, 'id', function ($data) {
                                     return $data['username'] . ' - ' . $data['email'];
@@ -53,12 +57,6 @@ $users = Adm::getInstance()->manager->createUserQuery()->all();
                         </div>
                         <div class="col-sm-6">
                             <?= $form->field($model, 'email')->textInput(['maxlength' => 255]) ?>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-sm-12">
-                            <?= $form->field($model, 'title')->textInput() ?>
                         </div>
                     </div>
 
