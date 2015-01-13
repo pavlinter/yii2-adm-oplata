@@ -30,17 +30,17 @@ class TransactionController extends Controller
                 'rules' => [
                     [
                         'allow' => true,
-                        'actions' => ['index', 'user-list'],
+                        'actions' => ['index', 'user-list', 'mail'],
                         'roles' => ['Adm-OplataRead'],
                     ],
                     [
                         'allow' => true,
-                        'actions' => ['create'],
+                        'actions' => ['create', 'send-email'],
                         'roles' => ['Adm-OplataCreate'],
                     ],
                     [
                         'allow' => true,
-                        'actions' => ['update'],
+                        'actions' => ['update', 'send-email'],
                         'roles' => ['Adm-OplataUpdate'],
                     ],
                     [
@@ -303,6 +303,89 @@ class TransactionController extends Controller
             $out['results'] = ['id' => 0, 'text' => 'No matching records found'];
         }
         echo Json::encode($out);
+    }
+
+    /**
+     * @return string
+     */
+    public function actionMail() {
+
+        $model = Module::getInstance()->manager->createOplataTransaction();
+        $this->layout = false;
+        $model->id = "xxxxxx";
+        $model->currency = "USD";
+        $model->email = "test@test.com";
+        $model->created_at = time();
+        $model->title = "test";
+        //echo Yii::t('app/test', 'TEST');
+        return $this->render(Module::getInstance()->mailTemplate,[
+            'model' => $model,
+            'enableDot' => true,
+            'username' => 'Bob',
+        ]);
+    }
+
+    /**
+     * @throws NotFoundHttpException
+     */
+    public function actionSendEmail($id = null) {
+        $json['r'] = 1;
+        if ($id === null) {
+            $order_id = Yii::$app->request->post('id');
+        } else {
+            $order_id = $id;
+        }
+
+        if (!$order_id) {
+            if ($id !== null) {
+                return $this->redirect(['index']);
+            }
+            $json['r'] = 0;
+            return Json::encode($json);
+        }
+
+        $model = $this->findModel($order_id);
+
+        //Yii::$app->getI18n()->changeLanguage($model->language_id);
+
+        $module = Module::getInstance();
+
+        if ($module->sendFunc === null) {
+            $sendFunc = function ($model,$module, $user, $username) {
+                Yii::$app->mailer->htmlLayout = false;
+                return Yii::$app->mailer->compose([
+                        'html' => $module->mailTemplate,
+                    ], [
+                        'model' => $model,
+                        'username' => $username,
+                    ])->setTo($model->email)
+                        ->setFrom($module->sendFrom)
+                        ->setSubject(Adm::t("oplata", "Invoice Subject", ['dot' => false]))
+                        ->send();
+            };
+        } else {
+            $sendFunc = $module->sendFunc;
+        }
+        $username = '';
+        if ($model->user_id) {
+            $user = $model->user;
+            if ($user) {
+                $username = $user->username;
+            }
+        }
+
+        if ($sendFunc($model, $module, $user , $username)) {
+            $model->sent_email = 1;
+            if (!$model->save(false)) {
+                $json['r'] = 0;
+            }
+        } else {
+            $json['r'] = 0;
+        }
+        if ($id !== null) {
+            return $this->redirect(['index']);
+        }
+        return Json::encode($json);
     }
 
     /**

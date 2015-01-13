@@ -1,5 +1,6 @@
 <?php
 
+use kartik\checkbox\CheckboxX;
 use pavlinter\admoplata\Module;
 use pavlinter\multifields\MultiFields;
 use yii\helpers\Html;
@@ -14,6 +15,8 @@ use pavlinter\adm\Adm;
 /* @var $userModel \pavlinter\adm\models\User */
 
 $userModel = Adm::getInstance()->manager->createUser();
+
+$languages = Yii::$app->getI18n()->getLanguages();
 
 $attributes = $userModel->attributes();
 $var = '';
@@ -122,13 +125,26 @@ SCRIPT;
                     </div>
 
                     <div class="row">
-                        <div class="col-sm-6">
+                        <div class="col-sm-3">
                             <?= $form->field($model, 'response_status')->widget(\kartik\widgets\Select2::classname(), [
                                 'data' => Module::getInstance()->manager->createOplataTransactionQuery('status_list'),
                             ]); ?>
                         </div>
-                        <div class="col-sm-6">
+                        <div class="col-sm-3">
                             <?= $form->field($model, 'payment_id')->textInput(['readonly' => true]) ?>
+                        </div>
+
+                        <div class="col-sm-3">
+                            <?= $form->field($model, 'language_id')->widget(\kartik\widgets\Select2::classname(), [
+                                'data' => \yii\helpers\ArrayHelper::map($languages, 'id', 'name'),
+                            ]); ?>
+                        </div>
+
+                        <div class="col-sm-3 form-without-label">
+
+                            <?php if (!$model->isNewRecord) {?>
+                                <?= $form->field($model, 'sent_email', ["template" => "{input}\n{label}\n{hint}\n{error}"])->widget(CheckboxX::classname(), ['pluginOptions'=>['threeState' => false]]); ?>
+                            <?php }?>
                         </div>
                     </div>
 
@@ -217,12 +233,12 @@ $this->registerJs('
     }
 
     $("#oplatatransaction-user_id").on("select2-selecting", function(e){
-        $("#oplatatransaction-email,#oplatatransaction-person").prop("disabled",true);
+        $("#oplatatransaction-email,#oplatatransaction-person").prop("disabled",true).val("");
     }).on("select2-removed", function(e){
         $("#oplatatransaction-email,#oplatatransaction-person").prop("disabled",false);
     });
     if($("#oplatatransaction-user_id").select2("val")){
-        $("#oplatatransaction-email,#oplatatransaction-person").prop("disabled",true);
+        $("#oplatatransaction-email,#oplatatransaction-person").prop("disabled",true).val("");
     }
 
     if(!disabledUpdate){

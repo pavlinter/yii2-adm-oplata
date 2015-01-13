@@ -28,6 +28,8 @@ use yii\db\Expression;
  * @property string $response_data
  * @property string $alias
  * @property string $created_at
+ * @property string $sent_email
+ *
  *
  * @property OplataItem[] $items
  * @property User $user
@@ -73,8 +75,8 @@ class OplataTransaction extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['user_id', 'payment_id'], 'integer'],
-            [['price', 'currency','response_status', 'alias', 'title'], 'required'],
+            [['user_id', 'payment_id', 'language_id'], 'integer'],
+            [['price', 'currency','response_status', 'alias', 'title', 'language_id'], 'required'],
             [['price', 'shipping'], 'double'],
             [['email'], 'email'],
             [['currency'], 'in', 'range' => array_keys(self::currency_list())],
@@ -85,6 +87,7 @@ class OplataTransaction extends \yii\db\ActiveRecord
             [['description'], 'string'],
             [['email', 'person'], 'string', 'max' => 255],
             [['alias'], 'string', 'max' => 32],
+            [['sent_email'], 'boolean'],
         ];
     }
 
@@ -94,8 +97,8 @@ class OplataTransaction extends \yii\db\ActiveRecord
     public function scenarios()
     {
         $scenarios = parent::scenarios();
-        $scenarios['createOrder'] = ['user_id', 'email', 'shipping', 'data', 'title',  'description', 'currency'];
-        $scenarios['admCreate'] = ['user_id', 'email', 'person', 'title', 'description', 'shipping', 'currency', 'response_status'];
+        $scenarios['createOrder'] = ['user_id', 'email', 'shipping', 'data', 'title',  'description', 'currency', 'language_id'];
+        $scenarios['admCreate'] = ['user_id', 'email', 'person', 'title', 'description', 'shipping', 'currency', 'language_id', 'sent_email', 'response_status'];
         $scenarios['admUpdate'] = $scenarios['admCreate'];
 
         return $scenarios;
@@ -148,6 +151,7 @@ class OplataTransaction extends \yii\db\ActiveRecord
         return [
             'id' => Yii::t('modelAdm/oplata_transaction', 'ID'),
             'user_id' => Yii::t('modelAdm/oplata_transaction', 'User'),
+            'language_id' => Yii::t('modelAdm/oplata_transaction', 'Language'),
             'person' => Yii::t('modelAdm/oplata_transaction', 'Person'),
             'email' => Yii::t('modelAdm/oplata_transaction', 'Email'),
             'title' => Yii::t('modelAdm/oplata_transaction', 'Title'),
@@ -162,6 +166,7 @@ class OplataTransaction extends \yii\db\ActiveRecord
             'response_data' => Yii::t('modelAdm/oplata_transaction', 'Response Data'),
             'alias' => Yii::t('modelAdmoplata_transaction', 'Alias'),
             'created_at' => Yii::t('modelAdm/oplata_transaction', 'Created'),
+            'sent_email' => Yii::t('modelAdm/oplata_transaction', 'Send to Email'),
         ];
     }
 
@@ -180,6 +185,14 @@ class OplataTransaction extends \yii\db\ActiveRecord
     public function getUser()
     {
         return $this->hasOne(Adm::getInstance()->manager->createUserQuery('className'), ['id' => 'user_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getLanguage()
+    {
+        return $this->hasOne(Adm::getInstance()->manager->createLanguageQuery('className'), ['id' => 'language_id']);
     }
 
     /**

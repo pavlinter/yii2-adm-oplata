@@ -28,7 +28,7 @@ class m141222_111442_adm_oplata_access extends Migration
             ],
             [
                 'Adm-OplataCreate',
-                1,
+                2,
                 NULL,
                 NULL,
                 NULL,
@@ -37,7 +37,7 @@ class m141222_111442_adm_oplata_access extends Migration
             ],
             [
                 'Adm-OplataRead',
-                1,
+                2,
                 NULL,
                 NULL,
                 NULL,
@@ -46,7 +46,7 @@ class m141222_111442_adm_oplata_access extends Migration
             ],
             [
                 'Adm-OplataUpdate',
-                1,
+                2,
                 NULL,
                 NULL,
                 NULL,
@@ -55,7 +55,7 @@ class m141222_111442_adm_oplata_access extends Migration
             ],
             [
                 'Adm-OplataDelete',
-                1,
+                2,
                 NULL,
                 NULL,
                 NULL,
@@ -64,7 +64,7 @@ class m141222_111442_adm_oplata_access extends Migration
             ],
             [
                 'Adm-OplataDeleteItem',
-                1,
+                2,
                 NULL,
                 NULL,
                 NULL,

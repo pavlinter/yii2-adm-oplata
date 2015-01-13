@@ -15,6 +15,7 @@ class m141222_111405_adm_oplata extends Migration
         $this->createTable('{{%oplata_transaction}}', [
             'id' => Schema::TYPE_BIGPK,
             'user_id' => Schema::TYPE_INTEGER . " DEFAULT NULL",
+            'language_id' => Schema::TYPE_INTEGER . "(11) NOT NULL",
             'person' => Schema::TYPE_STRING . "(255) DEFAULT NULL",
             'email' => Schema::TYPE_STRING . "(255) DEFAULT NULL",
             'title' => Schema::TYPE_STRING . "(1024) NOT NULL",
@@ -29,10 +30,12 @@ class m141222_111405_adm_oplata extends Migration
             'response_data' => Schema::TYPE_TEXT,
             'alias' =>  Schema::TYPE_STRING . "(32) NOT NULL",
             'created_at' => Schema::TYPE_TIMESTAMP . " NOT NULL",
+            'sent_email' => Schema::TYPE_SMALLINT . "(1) NOT NULL DEFAULT '0'",
         ], $tableOptions);
 
         $this->createIndex('user_id', '{{%oplata_transaction}}', 'user_id');
         $this->createIndex('alias', '{{%oplata_transaction}}', 'alias');
+        $this->createIndex('language_id', '{{%oplata_transaction}}', 'language_id');
         $this->addForeignKey('oplata_transaction_ibfk_1', '{{%oplata_transaction}}', 'user_id', '{{%user}}', 'id', 'SET NULL', 'SET NULL');
 
         $this->createTable('{{%oplata_item}}', [

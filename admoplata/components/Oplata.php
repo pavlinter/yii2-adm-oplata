@@ -25,6 +25,7 @@ class Oplata extends Component
     public $url = 'https://api.oplata.com/api/checkout/redirect/'; //'https://api.oplata.com/api/checkout/url/';
 
     public $responseFields = [
+        'lang',
         'rrn',
         'masked_card',
         'sender_cell_phone',
@@ -180,7 +181,12 @@ class Oplata extends Component
         foreach ($items as $item) {
             /* @var $item \pavlinter\admoplata\models\OplataItem */
             if (!$item->validate()) {
-                $this->setError(reset($item->getErrors()), false);
+                $errors = $item->getErrors();
+                foreach ($errors as $field => $errs) {
+                    foreach ($errs as $err) {
+                        $this->setError($err, false);
+                    }
+                }
                 return false;
             }
             $price += $item->price * $item->amount;
@@ -199,7 +205,12 @@ class Oplata extends Component
             }
             return $order;
         }
-        $this->setError(reset($order->getErrors()), false);
+        $errors = $order->getErrors();
+        foreach ($errors as $field => $errs) {
+            foreach ($errs as $err) {
+                $this->setError($err, false);
+            }
+        }
         return false;
     }
 
@@ -208,7 +219,7 @@ class Oplata extends Component
      * @param $currency
      * @return string
      */
-    public function price($int, $currency)
+    public function price($int, $currency = null)
     {
         if ($currency) {
             $currency = ' ' . Module::getInstance()->manager->createOplataTransactionQuery('currency_list', $currency);
@@ -256,6 +267,7 @@ class Oplata extends Component
     {
         if ($param === false) {
             $this->errors[] = $msg;
+            return;
         }
 
         if (!isset($params['dot'])) {

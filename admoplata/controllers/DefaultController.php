@@ -82,6 +82,7 @@ class DefaultController extends Controller
         Yii::$app->oplata->addItem($item2);
         $order = Yii::$app->oplata->createOrder([
             'user_id' => null,
+            'language_id' => Yii::$app->getI18n()->getId(),
             'email' => 'ttt@ttt.lv',
             'title' => 'Тестовый заказ',
             'currency' => OplataTransaction::CURRENCY_USD,
@@ -91,7 +92,11 @@ class DefaultController extends Controller
         if ($order !== false) {
             return $this->redirect(['invoice', 'alias' => $order->alias]);
         }
-        exit('error: '.Yii::$app->oplata->getError());
+
+        echo '<pre>';
+        echo print_r(Yii::$app->oplata->getErrors());
+        echo '</pre>';
+        exit();
     }
 
 
@@ -114,7 +119,18 @@ class DefaultController extends Controller
             return $this->redirect(['invoice', 'alias' => $model->alias]);
         }
 
+        $languages = Yii::$app->getI18n()->getLanguages();
+        if (isset($languages[$model->language_id])) {
+            $lang = $languages[$model->language_id][Yii::$app->getI18n()->langColCode];
+            if (!in_array($lang, ['ru', 'uk', 'en', 'lv'])) {
+                $lang = 'en';
+            }
+        } else {
+            $lang = 'en';
+        }
+
         $request = array(
+            'lang' => $lang,
             'order_id' => $model->id . Oplata::ORDER_SEPARATOR . time(),
             'order_desc' => $model->title,
             'currency' => $model->currency,
@@ -171,7 +187,6 @@ class DefaultController extends Controller
             $errors = Yii::$app->oplata->getErrors();
             foreach ($errors as $error) {
                 Yii::warning($error, 'admoplata');
-                echo $error;
             }
         }
     }

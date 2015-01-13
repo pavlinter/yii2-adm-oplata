@@ -21,6 +21,7 @@ Yii::$app->i18n->resetDot();
 
     <p>
         <?= Html::a(Adm::t('oplata', 'Create Order', ['dot' => true]), ['create'], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a(Adm::t('oplata', 'Email Template', ['dot' => true]), ['mail'], ['class' => 'btn btn-primary']) ?>
     </p>
 
     <?php Yii::$app->i18n->disableDot();?>
@@ -28,15 +29,17 @@ Yii::$app->i18n->resetDot();
     <?= Adm::widget('GridView',[
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
+        'showPageSummary' => true,
         'columns' => [
             [
                 'attribute' => 'id',
                 'vAlign' => 'middle',
                 'hAlign' => 'center',
-                'width' => '70px',
+                'width' => '80px',
             ],
             [
                 'attribute' => 'payment_id',
+                'width' => '130px',
                 'vAlign' => 'middle',
                 'hAlign' => 'center',
             ],
@@ -58,13 +61,33 @@ Yii::$app->i18n->resetDot();
             ],
             [
                 'attribute' => 'price',
+                'width' => '130px',
                 'vAlign' => 'middle',
                 'hAlign' => 'center',
+                'pageSummary' => true,
+                'format' => ['decimal', 2],
                 'value' => function ($model) {
-                    return Yii::$app->oplata->price($model->price + $model->shipping, $model->currency);
+                    return $model->price + $model->shipping;
                 },
             ],
-
+            [
+                'attribute' => 'currency',
+                'width' => '50px',
+                'vAlign' => 'middle',
+                'hAlign' => 'center',
+                'filterType' => GridView::FILTER_SELECT2,
+                'filter'=> Module::getInstance()->manager->createOplataTransactionQuery('currency_list'),
+                'value' => function ($model) {
+                    if (!empty($model->currency)) {
+                        return Module::getInstance()->manager->createOplataTransactionQuery('currency_list', $model->currency);
+                    }
+                },
+                'filterWidgetOptions' => [
+                    'pluginOptions' => ['allowClear' => true ],
+                ],
+                'filterInputOptions' => ['placeholder' => Adm::t('','Select ...', ['dot' => false])],
+                'format' => 'raw'
+            ],
             [
                 'attribute' => 'response_status',
                 'vAlign' => 'middle',
@@ -93,9 +116,51 @@ Yii::$app->i18n->resetDot();
             ],
             [
                 'attribute' => 'created_at',
+                'width' => '160px',
+                'filterType' => GridView::FILTER_DATE,
+                'filterWidgetOptions' => [
+                    'pluginOptions' => [
+                        'allowClear' => true,
+                        'todayHighlight' => true,
+                        'format' => 'yyyy-mm-dd',
+                    ],
+                ],
                 'vAlign' => 'middle',
                 'hAlign' => 'center',
-                'format' => 'datetime',
+            ],
+            [
+                'attribute' => 'sent_email',
+                'width' => '120px',
+                'vAlign' => 'middle',
+                'hAlign' => 'center',
+                'format' => 'raw',
+                'value' => function ($model) {
+                    if ($model->sent_email || $model->response_status !== $model::STATUS_NOT_PAID) {
+                        return Html::tag('span', '', [
+                            'class' => 'glyphicon glyphicon-ok text-success',
+                        ]);
+                    }
+
+                    return \pavlinter\buttons\AjaxButton::widget([
+                        'label' => Adm::t('oplata', 'Send'),
+                        'options' => [
+                            'class' => 'btn btn-primary',
+                        ],
+                        'ajaxOptions' => [
+                            'url' => Url::to('send-email'),
+                            'data' => [
+                                'id' => $model->id,
+                            ],
+                            'done' => 'function(data){
+                                if(data.r){
+                                    $("#" + abId).next("span").removeClass("hide").end().remove();
+                                }
+                            }',
+                        ],
+                    ]) . Html::tag('span', '', [
+                        'class' => 'glyphicon glyphicon-ok text-success hide',
+                    ]);
+                },
             ],
             [
                 'class' => '\kartik\grid\ActionColumn',

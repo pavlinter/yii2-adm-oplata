@@ -1,5 +1,6 @@
 <?php
 
+use frontend\assets\AppAsset;
 use pavlinter\admoplata\models\OplataTransaction;
 use pavlinter\admoplata\Module;
 use yii\helpers\Url;
@@ -8,7 +9,7 @@ use yii\helpers\Url;
 /* @var $model OplataTransaction */
 
 $admoplata = Module::getInstance();
-
+$appAsset = AppAsset::register($this);
 $admoplata->layout = $admoplata->invoiceLayout;
 $this->title = Yii::t('adm/admoplata',"Invoice: #{id}, {title}", ['id' => $model->id, 'title' => $model->title, 'dot' => false]);
 ?>
@@ -18,19 +19,14 @@ $this->title = Yii::t('adm/admoplata',"Invoice: #{id}, {title}", ['id' => $model
         <div class="panel-body">
             <div class="row">
                 <div class="col-sm-6">
-
-                    <h5 class="lg-title mb10"><?= Yii::t('adm/admoplata','From', ['dot' => true]) ?></h5>
-                    <address>
-                        <?= Yii::t('adm/admoplata',"<strong>Web Services, Inc.</strong><br/>795 Folsom Ave, Suite 600<br/><abbr>P:</abbr> (123) 000-000", ['dot' => true]) ?>
-                    </address>
-
+                    <?= Yii::t('adm/admoplata','<h5 class="lg-title mb10">From</h5><address>Web Services, Inc.</address>', ['dot' => true]) ?>
                 </div><!-- col-sm-6 -->
 
                 <div class="col-sm-6 text-right">
-                    <h4 class="text-primary"><?= Yii::t('adm/admoplata','Invoice No. {invoice-number}', ['invoice-number' => $model->id,'dot' => true]) ?></h4>
                     <div>
                         <?php if ($model->user_id) {?>
-                            <?= Yii::t('adm/admoplata',"To: {email}<br/>Invoice Date: {date}<br/>Status: {status}<br/>{description}", [
+                            <?= Yii::t('adm/admoplata','<h4 class="text-primary">Invoice No. {invoice-number}</h4>To: {email}<br/>Invoice Date: {date}<br/>Status: {status}<br/>{description}', [
+                                'invoice-number' => $model->id,
                                 'email' => $model->email,
                                 'date' => Yii::$app->formatter->asDate($model->created_at),
                                 'time' => Yii::$app->formatter->asTime($model->created_at),
@@ -39,7 +35,8 @@ $this->title = Yii::t('adm/admoplata',"Invoice: #{id}, {title}", ['id' => $model
                                 'dot' => false,
                             ]); ?>
                         <?php } else {?>
-                            <?= Yii::t('adm/admoplata',"To: {person}<br/>Email: {email}<br/>Invoice Date: {date}<br/>Status: {status}<br/>{description}", [
+                            <?= Yii::t('adm/admoplata','<h4 class="text-primary">Invoice No. {invoice-number}</h4>To: {person}<br/>Email: {email}<br/>Invoice Date: {date}<br/>Status: {status}<br/>{description}', [
+                                'invoice-number' => $model->id,
                                 'person' => $model->person,
                                 'email' => $model->email,
                                 'date' => Yii::$app->formatter->asDate($model->created_at),
@@ -50,10 +47,10 @@ $this->title = Yii::t('adm/admoplata',"Invoice: #{id}, {title}", ['id' => $model
                             ]); ?>
                         <?php }?>
 
-                        <?= Yii::t('adm/admoplata',"To: {email}<br/>Invoice Date: {date}<br/>Status: {status}<br/>{description}", [
+                        <?= Yii::t('adm/admoplata','<h4 class="text-primary">Invoice No. {invoice-number}</h4>To: {email}<br/>Invoice Date: {date}<br/>Status: {status}<br/>{description}', [
                             'dot' => '.',
                         ]); ?>
-                        <?= Yii::t('adm/admoplata',"To: {person}<br/>Email: {email}<br/>Invoice Date: {date}<br/>Status: {status}<br/>{description}", [
+                        <?= Yii::t('adm/admoplata','<h4 class="text-primary">Invoice No. {invoice-number}</h4>To: {person}<br/>Email: {email}<br/>Invoice Date: {date}<br/>Status: {status}<br/>{description}', [
                             'dot' => '.',
                         ]); ?>
                     </div>

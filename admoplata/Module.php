@@ -21,6 +21,12 @@ class Module extends \yii\base\Module implements AdmBootstrapInterface
 
     public $userSelect = [];
 
+    public $sendFunc = null;
+
+    public $sendFrom = null; // default Yii::$app->params['adminEmail']
+
+    public $mailTemplate = "@vendor/pavlinter/yii2-adm-oplata/admoplata/views/transaction/email-template";
+
     /**
      * @inheritdoc
      */
@@ -70,6 +76,10 @@ class Module extends \yii\base\Module implements AdmBootstrapInterface
         }
         if (!is_callable($this->userSelect['queryLoad'])) {
             throw new InvalidConfigException('The "viewCallback" property must be callable.');
+        }
+
+        if($this->sendFrom === null){
+            $this->sendFrom = Yii::$app->params['adminEmail'];
         }
 
         parent::init();

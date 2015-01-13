@@ -18,7 +18,7 @@ class OplataTransactionSearch extends OplataTransaction
     {
         return [
             [['id', 'user_id', 'payment_id'], 'integer'],
-            [['email', 'currency', 'order_status', 'response_status', 'data', 'response_data', 'alias', 'created_at'], 'safe'],
+            [['email', 'currency', 'order_status', 'response_status', 'created_at'], 'safe'],
             [['price', 'shipping'], 'number'],
         ];
     }
@@ -62,16 +62,21 @@ class OplataTransactionSearch extends OplataTransaction
             'payment_id' => $this->payment_id,
             'price' => $this->price,
             'shipping' => $this->shipping,
-            'created_at' => $this->created_at,
+            'sent_email' => $this->sent_email,
         ]);
+
+
 
         $query->andFilterWhere(['like', 'email', $this->email])
             ->andFilterWhere(['like', 'currency', $this->currency])
             ->andFilterWhere(['like', 'order_status', $this->order_status])
-            ->andFilterWhere(['like', 'response_status', $this->response_status])
-            ->andFilterWhere(['like', 'data', $this->data])
-            ->andFilterWhere(['like', 'response_data', $this->response_data])
-            ->andFilterWhere(['like', 'alias', $this->alias]);
+            ->andFilterWhere(['like', 'response_status', $this->response_status]);
+
+        if ($this->created_at) {
+            $query->andWhere('DATE(created_at) = :date', ['date' => $this->created_at]);
+        }
+
+
 
         return $dataProvider;
     }
