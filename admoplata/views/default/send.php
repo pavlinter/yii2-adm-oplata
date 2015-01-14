@@ -39,6 +39,16 @@ $this->registerJs('
         <?php Alert::end(); ?>
 
     <?php } else {?>
+
+        <?php Alert::begin([
+            'closeButton' => false,
+            'options' => [
+                'class' => 'alert-info',
+            ],
+        ]) ?>
+        <?= Module::t('', "Wait please!"); ?>
+        <?php Alert::end(); ?>
+
         <?php $form = ActiveForm::begin([
             'id' => 'returnform',
             'action' => Yii::$app->oplata->url,

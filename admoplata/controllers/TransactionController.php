@@ -338,7 +338,7 @@ class TransactionController extends Controller
         }
 
         $model = $this->findModel($order_id);
-
+        $currentLang = Yii::$app->getI18n()->getId();
         Yii::$app->getI18n()->changeLanguage($model->language_id);
 
         $module = Module::getInstance();
@@ -377,6 +377,7 @@ class TransactionController extends Controller
             $json['r'] = 0;
         }
         if ($id !== null) {
+            Yii::$app->getI18n()->changeLanguage($currentLang);
             return $this->redirect(['index']);
         }
         return Json::encode($json);

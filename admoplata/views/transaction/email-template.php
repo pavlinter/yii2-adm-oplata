@@ -7,7 +7,8 @@ use yii\helpers\Url;
 
 /* @var $this yii\web\View */
 
-
+$I18n = Yii::$app->getI18n();
+$language = $I18n->getLanguage();
 ?>
 
 <?php $this->beginPage() ?>

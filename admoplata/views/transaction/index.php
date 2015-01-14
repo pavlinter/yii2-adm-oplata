@@ -64,7 +64,9 @@ Yii::$app->i18n->resetDot();
                 'width' => '130px',
                 'vAlign' => 'middle',
                 'hAlign' => 'center',
-                'pageSummary' => true,
+                'pageSummary' => function ($summary, $data, $widget) {
+                    return Adm::t('oplata', 'Count is {summary}', ['summary' => $summary,'dot' => true]);
+                },
                 'format' => ['decimal', 2],
                 'value' => function ($model) {
                     return $model->price + $model->shipping;

@@ -231,6 +231,7 @@ $this->registerJs('
     if(disabledUpdate){
         $("#order-form").find(":input").prop("readonly",true);
         $(".mf-btn-close,.cloneBtn,.btnAct").hide();
+        $("#oplatatransaction-sent_email").checkboxX("refresh");
     }
 
     $("#oplatatransaction-user_id").on("select2-selecting", function(e){
