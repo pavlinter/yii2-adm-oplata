@@ -31,7 +31,7 @@ foreach ($attributes as $attribute) {
 
 <div class="oplata-transaction-form m-t-lg">
 
-    <?php $form = ActiveForm::begin(['id' => 'order-form',]); ?>
+    <?php $form = Adm::begin('ActiveForm', ['id' => 'order-form']); ?>
 
     <div class="row">
         <div class="col-md-6">
@@ -207,7 +207,8 @@ SCRIPT;
     <div class="form-group">
         <div class="row">
             <div class="col-xs-6">
-                <?= Html::submitButton($model->isNewRecord ? Adm::t('oplata', 'Create', ['dot' => false]) : Adm::t('oplata', 'Update', ['dot' => false]), ['class' => 'btn btn-primary btnAct']) ?>
+                <?= Html::submitButton($model->isNewRecord ? Adm::t('oplata', 'Create', ['dot' => false]) : Adm::t('oplata', 'Update', ['dot' => false]), ['class' => 'btn btn-primary btnAct btnSimple']) ?>
+                <?= Html::submitButton($model->isNewRecord ? Adm::t('oplata', 'Create And Send', ['dot' => false]) : Adm::t('oplata', 'Update And Send', ['dot' => false]), ['class' => 'btn btn-primary btnAct btnSend']) ?>
             </div>
             <div class="col-xs-6">
                 <a class="btn btn-s-md btn-white cloneBtn" href="javascript:void(0);">
@@ -218,7 +219,7 @@ SCRIPT;
         </div>
     </div>
 
-    <?php ActiveForm::end(); ?>
+    <?php Adm::end('ActiveForm'); ?>
 
 </div>
 
@@ -242,6 +243,15 @@ $this->registerJs('
     }
 
     if(!disabledUpdate){
+        var redirect;
+        $(".btnSend").on("click",function(e){
+            redirect = "' . Url::to(['send-email']) . '";
+        });
+
+        $(".btnSimple").on("click",function(e){
+            redirect = false;
+        });
+
         $("#order-form").on("beforeSubmit",function(e){
             var $form = $(this);
             jQuery.ajax({
@@ -251,7 +261,11 @@ $this->registerJs('
                     data: $form.serialize(),
                     success: function(d) {
                         if(d.r) {
-                            location.href = "' . Url::to(['index']) . '";
+                            if(redirect){
+                                location.href = redirect + "?id=" + d.id;
+                            } else {
+                                location.href = "' . Url::to(['index']) . '";
+                            }
                         } else {
                             $form.trigger("updateErrors",[d.errors]).trigger("scrollToError");
                         }

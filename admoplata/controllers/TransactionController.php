@@ -7,7 +7,6 @@ use pavlinter\adm\filters\AccessControl;
 use pavlinter\admoplata\Module;
 use pavlinter\multifields\ModelHelper;
 use Yii;
-use yii\db\Query;
 use yii\helpers\Json;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -117,7 +116,7 @@ class TransactionController extends Controller
                     }
                     if (Yii::$app->request->isAjax) {
                         Yii::$app->response->format = Response::FORMAT_JSON;
-                        return ['r' =>1, 'newId' => $newId];
+                        return ['r' =>1, 'newId' => $newId, 'id' => $model->id];
                     } else {
                         return $this->redirect(['index']);
                     }
@@ -194,7 +193,7 @@ class TransactionController extends Controller
 
                     if (Yii::$app->request->isAjax) {
                         Yii::$app->response->format = Response::FORMAT_JSON;
-                        return ['r' =>1, 'newId' => $newId];
+                        return ['r' =>1, 'newId' => $newId, 'id' => $model->id];
                     } else {
                         return $this->redirect(['index']);
                     }
@@ -207,7 +206,6 @@ class TransactionController extends Controller
                 }
             }
         }
-
 
         return $this->render('update', [
             'model' => $model,
@@ -266,7 +264,6 @@ class TransactionController extends Controller
         $querySearch = Module::getInstance()->userSelect['querySearch'];
         $queryLoad = Module::getInstance()->userSelect['queryLoad'];
 
-
         $userTable      = forward_static_call(array(Adm::getInstance()->manager->userClass, 'tableName'));
         $out = ['more' => false];
 
@@ -276,7 +273,6 @@ class TransactionController extends Controller
 
             $results = [];
             foreach ($rows as $row) {
-
                 $params = [];
                 foreach ($row as $attribute => $value) {
                     if (in_array($attribute, ['auth_key', 'password_hash', 'password_reset_token', 'role', 'status'])) {
@@ -292,14 +288,11 @@ class TransactionController extends Controller
                     'template' => Adm::t('oplata', "Email - {email} Username - {username}", $params),
                 ];
             }
-
             $out['results'] = $results;
-        }
-        elseif ($id > 0) {
+        } else if ($id > 0) {
             $row = $queryLoad($userTable, $id);
             $out['results'] = ['id' => $id, 'text' => $viewCallback($row)];
-        }
-        else {
+        } else {
             $out['results'] = ['id' => 0, 'text' => 'No matching records found'];
         }
         echo Json::encode($out);
@@ -317,7 +310,7 @@ class TransactionController extends Controller
         $model->email = "test@test.com";
         $model->created_at = time();
         $model->title = "test";
-        //echo Yii::t('app/test', 'TEST');
+
         return $this->render(Module::getInstance()->mailTemplate,[
             'model' => $model,
             'enableDot' => true,
@@ -346,7 +339,7 @@ class TransactionController extends Controller
 
         $model = $this->findModel($order_id);
 
-        //Yii::$app->getI18n()->changeLanguage($model->language_id);
+        Yii::$app->getI18n()->changeLanguage($model->language_id);
 
         $module = Module::getInstance();
 
@@ -367,6 +360,7 @@ class TransactionController extends Controller
             $sendFunc = $module->sendFunc;
         }
         $username = '';
+        $user = null;
         if ($model->user_id) {
             $user = $model->user;
             if ($user) {

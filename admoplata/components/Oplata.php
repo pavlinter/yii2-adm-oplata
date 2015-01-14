@@ -10,7 +10,40 @@ use yii\base\InvalidConfigException;
 
 /**
  * Class Oplata
+ *
+ * $item1 = new OplataItem();
+ * $item1->title = 'Item 1';
+ * $item1->description = 'Item 1Item 1Item 1Item 1Item 1';
+ * $item1->price = '20';
+ * $item1->amount = 1;
+ *
+ * $item2 = new OplataItem();
+ * $item2->title = 'Item 2';
+ * $item2->description = 'Item 2Item 2Item 2Item 2Item 2';
+ * $item2->price = '0.9';
+ * $item2->amount = 2;
+ *
+ * Yii::$app->oplata->clearItems();
+ * Yii::$app->oplata->addItem($item1);
+ * Yii::$app->oplata->addItem($item2);
+ * $order = Yii::$app->oplata->createOrder([
+ *     'user_id' => null,
+ *     'language_id' => Yii::$app->getI18n()->getId(),
+ *     'email' => 'bob@bob.com',
+ *     'title' => 'Тестовый заказ',
+ *     'currency' => OplataTransaction::CURRENCY_USD,
+ *     'shipping' => '0.89',
+ *     'data' => [], //or string or object
+ * ]);
+ * if ($order !== false) {
+ *    return $this->redirect(['invoice', 'alias' => $order->alias]);
+ * }
+ *
+ * echo '<pre>';
+ * echo print_r(Yii::$app->oplata->getErrors());
+ * echo '</pre>';
  */
+
 class Oplata extends Component
 {
     const ORDER_APPROVED = 'approved';
@@ -72,10 +105,8 @@ class Oplata extends Component
         }
     }
 
-
     /**
      * @param $data
-     * @param $password
      * @param bool $encoded
      * @return string
      */
@@ -275,6 +306,7 @@ class Oplata extends Component
         }
         $this->errors[] = Yii::t('admoplata/server_errors', $msg, $params);
     }
+
     /**
      * @return mixed
      */
@@ -295,7 +327,6 @@ class Oplata extends Component
         return null;
     }
 
-
     /**
      * @return bool
      */
@@ -312,5 +343,4 @@ class Oplata extends Component
     {
         $this->response;
     }
-
 }

@@ -166,7 +166,7 @@ class OplataTransaction extends \yii\db\ActiveRecord
             'response_data' => Yii::t('modelAdm/oplata_transaction', 'Response Data'),
             'alias' => Yii::t('modelAdmoplata_transaction', 'Alias'),
             'created_at' => Yii::t('modelAdm/oplata_transaction', 'Created'),
-            'sent_email' => Yii::t('modelAdm/oplata_transaction', 'Send to Email'),
+            'sent_email' => Yii::t('modelAdm/oplata_transaction', 'Email Sent'),
         ];
     }
 
