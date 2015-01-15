@@ -268,8 +268,8 @@ class TransactionController extends Controller
         $out = ['more' => false];
 
         if (!is_null($search)) {
-
-            $rows = $querySearch($userTable, $search);
+            $query = new \yii\db\Query();
+            $rows = $querySearch($query, $userTable, $search);
 
             $results = [];
             foreach ($rows as $row) {
@@ -290,7 +290,8 @@ class TransactionController extends Controller
             }
             $out['results'] = $results;
         } else if ($id > 0) {
-            $row = $queryLoad($userTable, $id);
+            $query = new \yii\db\Query();
+            $row = $queryLoad($query, $userTable, $id);
             $out['results'] = ['id' => $id, 'text' => $viewCallback($row)];
         } else {
             $out['results'] = ['id' => 0, 'text' => 'No matching records found'];
