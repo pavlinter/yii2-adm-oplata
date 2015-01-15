@@ -79,6 +79,7 @@ SCRIPT;
                                             return {results:data.results}; }
                                         '),
                                     ],
+                                    'escapeMarkup' => new JsExpression('function (m) { return m; }'),
                                     'initSelection' => new JsExpression($initScript)
                                 ],
                                 'pluginEvents' => [
