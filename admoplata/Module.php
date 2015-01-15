@@ -54,6 +54,7 @@ class Module extends \yii\base\Module implements AdmBootstrapInterface
         }
         if(!isset($this->userSelect['querySearch'])){
             $this->userSelect['querySearch'] = function ($query, $userTable, $search) {
+                /* @var \yii\db\Query $query */
                 return $query->from($userTable)
                     ->where(['like', 'email', $search])
                     ->limit(20)->all();
@@ -62,6 +63,7 @@ class Module extends \yii\base\Module implements AdmBootstrapInterface
 
         if(!isset($this->userSelect['queryLoad'])){
             $this->userSelect['queryLoad'] = function ($query, $userTable, $id) {
+                /* @var \yii\db\Query $query */
                 return $query->from($userTable)
                     ->where(['id' => $id])->one();
             };
