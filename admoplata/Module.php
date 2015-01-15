@@ -55,7 +55,7 @@ class Module extends \yii\base\Module implements AdmBootstrapInterface
             $this->userSelect['querySearch'] = function ($userTable, $search) {
                 $query = new \yii\db\Query();
                 return $query->from($userTable)
-                    ->where('email LIKE "%' . $search .'%"')
+                    ->where(['like', 'email', $search])
                     ->limit(20)->all();
             };
         }
