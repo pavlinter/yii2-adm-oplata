@@ -48,7 +48,8 @@ class Module extends \yii\base\Module implements AdmBootstrapInterface
     {
         if(!isset($this->userSelect['viewCallback'])){
             $this->userSelect['viewCallback'] = function ($row) {
-                return $row['email'];
+                $row['dot'] = false;
+                return Adm::t('oplata','{email}:select2 template', $row);
             };
         }
         if(!isset($this->userSelect['querySearch'])){
