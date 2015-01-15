@@ -1,11 +1,19 @@
 <?php
 
+/**
+ * @package yii2-adm-oplata
+ * @author Pavels Radajevs <pavlinter@gmail.com>
+ * @copyright Copyright &copy; Pavels Radajevs <pavlinter@gmail.com>, 2015
+ * @version 1.0.0
+ */
+
 namespace pavlinter\admoplata\controllers;
 
 use pavlinter\admoplata\components\Oplata;
 use pavlinter\admoplata\Module;
 use Yii;
 use yii\filters\VerbFilter;
+use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -56,6 +64,35 @@ class DefaultController extends Controller
         }
         return $this->render('invoice',[
             'model' => $model,
+        ]);
+    }
+
+    /**
+     * @param $alias
+     * @return string
+     * @throws NotFoundHttpException
+     */
+    public function actionPdf($alias)
+    {
+        Yii::$app->response->format = 'adm-pdf';
+
+        if ($alias === '') {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+        $model = Module::getInstance()->manager->createOplataTransactionQuery()->where(['alias' => $alias])->one();
+        if (!$model) {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+        $this->layout = false;
+
+        $logo = null;
+        if (isset(Module::getInstance()->pdf['image']['src'])) {
+            $logo = Html::img(Module::getInstance()->pdf['image']['src'], Module::getInstance()->pdf['image']);
+        }
+
+        return $this->render('pdf',[
+            'model' => $model,
+            'logo' => $logo,
         ]);
     }
 
@@ -131,7 +168,6 @@ class DefaultController extends Controller
         return $this->render('response',[
             'model' => $model,
         ]);
-
     }
 
     /**

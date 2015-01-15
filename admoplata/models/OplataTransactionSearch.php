@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * @package yii2-adm-oplata
+ * @author Pavels Radajevs <pavlinter@gmail.com>
+ * @copyright Copyright &copy; Pavels Radajevs <pavlinter@gmail.com>, 2015
+ * @version 1.0.0
+ */
+
 namespace pavlinter\admoplata\models;
 
 use Yii;
