@@ -35,6 +35,31 @@ https://www.oplata.com
         'class' => 'pavlinter\admoplata\components\Oplata',
         'merchantId' => 'xxxx', //own merchant id
         'password' => 'xxxx', //own password
+        'invoiceLayout' => '/main';
+        'layout' => '@vendor/pavlinter/yii2-adm/adm/views/layouts/main';
+        'userSelect' => [
+            'viewCallback' => null, //function ($row) {return Adm::t('oplata','{email}:select2 template', $row);}
+            'querySearch' => null, // function ($query, $userTable, $search) {/* @var \yii\db\Query $query */return $query->from($userTable)->where(['like', 'email', $search])->limit(20)->all();}
+            'queryLoad' => null, //function ($query, $userTable, $id) {/* @var \yii\db\Query $query */return $query->from($userTable)->where(['id' => $id])->one();}
+        ];
+        'sendFunc' => null; //function ($model, $module, $user, $username) {}
+        'sendFrom' => null; // default Yii::$app->params['adminEmail']
+        'mailTemplate' => '@vendor/pavlinter/yii2-adm-oplata/admoplata/views/transaction/email-template';
+        'pdf' => [
+            'image' => [ //logo htmlOptions
+                //'src' => '',
+            ],
+            'imageLink' => [ //logo link htmlOptions
+                //'href' => '',
+            ],
+        ];
+    ],
+    'response' => [
+        'formatters' => [
+            'adm-pdf' => [
+                'class' => 'pavlinter\admoplata\PdfResponseFormatter',
+            ],
+        ]
     ],
     ...
 ],

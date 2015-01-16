@@ -26,9 +26,13 @@ class Module extends \yii\base\Module implements AdmBootstrapInterface
 
     public $layout = '@vendor/pavlinter/yii2-adm/adm/views/layouts/main';
 
-    public $userSelect = [];
+    public $userSelect = [
+        'viewCallback' => null, //function ($row) {return Adm::t('oplata','{email}:select2 template', $row);}
+        'querySearch' => null, // function ($query, $userTable, $search) {/* @var \yii\db\Query $query */return $query->from($userTable)->where(['like', 'email', $search])->limit(20)->all();}
+        'queryLoad' => null, //function ($query, $userTable, $id) {/* @var \yii\db\Query $query */return $query->from($userTable)->where(['id' => $id])->one();}
+    ];
 
-    public $sendFunc = null;
+    public $sendFunc = null; //function ($model, $module, $user, $username) {}
 
     public $sendFrom = null; // default Yii::$app->params['adminEmail']
 
@@ -54,44 +58,19 @@ class Module extends \yii\base\Module implements AdmBootstrapInterface
                 ],
             ],
         ], $config);
-
-
         parent::__construct($id, $parent, $config);
     }
 
     public function init()
     {
-        if(!isset($this->userSelect['viewCallback'])){
-            $this->userSelect['viewCallback'] = function ($row) {
-                $row['dot'] = false;
-                return Adm::t('oplata','{email}:select2 template', $row);
-            };
-        }
-        if(!isset($this->userSelect['querySearch'])){
-            $this->userSelect['querySearch'] = function ($query, $userTable, $search) {
-                /* @var \yii\db\Query $query */
-                return $query->from($userTable)
-                    ->where(['like', 'email', $search])
-                    ->limit(20)->all();
-            };
-        }
-
-        if(!isset($this->userSelect['queryLoad'])){
-            $this->userSelect['queryLoad'] = function ($query, $userTable, $id) {
-                /* @var \yii\db\Query $query */
-                return $query->from($userTable)
-                    ->where(['id' => $id])->one();
-            };
-        }
-
-        if (!is_callable($this->userSelect['viewCallback'])) {
+        if ($this->userSelect['viewCallback'] !== null && !is_callable($this->userSelect['viewCallback'])) {
             throw new InvalidConfigException('The "viewCallback" property must be callable.');
         }
-        if (!is_callable($this->userSelect['querySearch'])) {
+        if ($this->userSelect['querySearch'] !== null && !is_callable($this->userSelect['querySearch'])) {
             throw new InvalidConfigException('The "querySearch" property must be callable.');
         }
-        if (!is_callable($this->userSelect['queryLoad'])) {
-            throw new InvalidConfigException('The "viewCallback" property must be callable.');
+        if ($this->userSelect['queryLoad'] !== null && !is_callable($this->userSelect['queryLoad'])) {
+            throw new InvalidConfigException('The "queryLoad" property must be callable.');
         }
 
         if($this->sendFrom === null){

@@ -268,13 +268,36 @@ class TransactionController extends Controller
         $querySearch = Module::getInstance()->userSelect['querySearch'];
         $queryLoad = Module::getInstance()->userSelect['queryLoad'];
 
+        if($viewCallback === null){
+            $viewCallback = function ($row) {
+                return Adm::t('oplata','{email}:select2 template', $row);
+            };
+        }
+        if($querySearch === null){
+            $querySearch = function ($query, $userTable, $search) {
+                /* @var \yii\db\Query $query */
+                return $query->from($userTable)
+                    ->where(['like', 'email', $search])
+                    ->limit(20)->all();
+            };
+        }
+
+        if($viewCallback === null){
+            $queryLoad = function ($query, $userTable, $id) {
+                /* @var \yii\db\Query $query */
+                return $query->from($userTable)
+                    ->where(['id' => $id])->one();
+            };
+        }
+
+
+
         $userTable      = forward_static_call(array(Adm::getInstance()->manager->userClass, 'tableName'));
         $out = ['more' => false];
 
         if (!is_null($search)) {
             $query = new \yii\db\Query();
-            $rows = $querySearch($query, $userTable, $search);
-
+            $rows = call_user_func($querySearch, $query, $userTable, $search);
             $results = [];
             foreach ($rows as $row) {
                 $params = [];
@@ -286,17 +309,20 @@ class TransactionController extends Controller
                 }
                 $params['dot'] = false;
                 $params['br']  = false;
+                if (isset($row['dot'])) {
+                    $row['dot'] = false;
+                }
                 $results[] = [
                     'id' => $row['id'],
-                    'text' => $viewCallback($row),
+                    'text' => call_user_func($viewCallback, $row),
                     'template' => Adm::t('oplata', "Email - {email} Username - {username}", $params),
                 ];
             }
             $out['results'] = $results;
         } else if ($id > 0) {
             $query = new \yii\db\Query();
-            $row = $queryLoad($query, $userTable, $id);
-            $out['results'] = ['id' => $id, 'text' => $viewCallback($row)];
+            $row = call_user_func($queryLoad, $query, $userTable, $id);
+            $out['results'] = ['id' => $id, 'text' => call_user_func($viewCallback, $row)];
         } else {
             $out['results'] = ['id' => 0, 'text' => 'No matching records found'];
         }
@@ -349,7 +375,7 @@ class TransactionController extends Controller
         $module = Module::getInstance();
 
         if ($module->sendFunc === null) {
-            $sendFunc = function ($model,$module, $user, $username) {
+            $sendFunc = function ($model, $module, $user, $username) {
                 Yii::$app->mailer->htmlLayout = false;
                 return Yii::$app->mailer->compose([
                         'html' => $module->mailTemplate,
