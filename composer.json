@@ -16,7 +16,9 @@
     ],
     "require": {
         "yiisoft/yii2": "*",
-        "pavlinter/yii2-multifields": "@dev"
+        "pavlinter/yii2-multifields": "@dev",
+        "pavlinter/yii2-buttons": "@dev",
+        "robregonm/yii2-pdf": "1.*"
     },
     "autoload": {
         "psr-4": {
