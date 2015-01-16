@@ -109,18 +109,15 @@ $this->title = Yii::t('adm/admoplata',"Invoice: #{id}, {title}", ['id' => $model
                 </tbody>
             </table>
 
-            <div class="text-right btn-invoice clearfix">
-
+            <div class="btn-invoice clearfix">
+                <a href="<?= Url::to(['pdf', 'alias' => $model->alias]) ?>" class="btn btn-primary btn-lg mr5 pull-left"><i class="fa fa-dollar mr5"></i> <?= Yii::t('adm/admoplata','Print Invoice', ['dot' => false]) ?></a>
                 <?php if ($model->response_status === OplataTransaction::STATUS_NOT_PAID) {?>
-                    <a href="<?= Url::to(['send', 'alias' => $model->alias]) ?>" class="btn btn-primary btn-lg mr5"><i class="fa fa-dollar mr5"></i> <?= Yii::t('adm/admoplata','Make A Payment', ['dot' => false]) ?></a>
+                    <a href="<?= Url::to(['send', 'alias' => $model->alias]) ?>" class="btn btn-primary btn-lg mr5 pull-right"><i class="fa fa-dollar mr5"></i> <?= Yii::t('adm/admoplata','Make A Payment', ['dot' => false]) ?></a>
                 <?php }?>
-                <a href="<?= Url::to(['pdf', 'alias' => $model->alias]) ?>" class="btn btn-primary btn-lg mr5"><i class="fa fa-dollar mr5"></i> <?= Yii::t('adm/admoplata','Print Invoice', ['dot' => false]) ?></a>
-                <div class="mb30"></div>
                 <?= Yii::t('adm/admoplata','Make A Payment', ['dot' => '.']) ?>
                 <?= Yii::t('adm/admoplata','Print Invoice', ['dot' => '.']) ?>
-
             </div>
-
+            <div class="mb30"></div>
             <div class="alert alert-info nomargin">
                 <?= Yii::t('adm/admoplata','Thank you for your business. Please make sure all cheques payable to <strong>Web Services, Inc.</strong>', ['dot' => true]) ?>
             </div>
