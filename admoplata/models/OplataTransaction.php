@@ -35,7 +35,9 @@ use yii\db\Expression;
  * @property string $response_data
  * @property string $alias
  * @property string $created_at
+ * @property string date_end
  * @property string $sent_email
+ * @property string remind_note
  *
  *
  * @property OplataItem[] $items
@@ -94,7 +96,8 @@ class OplataTransaction extends \yii\db\ActiveRecord
             [['description'], 'string'],
             [['email', 'person'], 'string', 'max' => 255],
             [['alias'], 'string', 'max' => 32],
-            [['sent_email'], 'boolean'],
+            [['sent_email', 'remind_note'], 'boolean'],
+            [['date_end'], 'date', 'format' => 'Y-m-d'],
         ];
     }
 
@@ -105,8 +108,8 @@ class OplataTransaction extends \yii\db\ActiveRecord
     {
         $scenarios = parent::scenarios();
         $scenarios['createOrder'] = ['user_id', 'email', 'shipping', 'data', 'title',  'description', 'currency', 'language_id'];
-        $scenarios['admCreate'] = ['user_id', 'email', 'person', 'title', 'description', 'shipping', 'currency', 'language_id', 'sent_email', 'response_status'];
-        $scenarios['admUpdate'] = $scenarios['admCreate'];
+        $scenarios['admCreate'] = ['user_id', 'email', 'person', 'title', 'description', 'shipping', 'currency', 'language_id', 'response_status' , 'date_end'];
+        $scenarios['admUpdate'] = ['user_id', 'email', 'person', 'title', 'description', 'shipping', 'currency', 'language_id', 'sent_email', 'remind_note', 'response_status', 'date_end'];
 
         return $scenarios;
     }
@@ -173,7 +176,9 @@ class OplataTransaction extends \yii\db\ActiveRecord
             'response_data' => Yii::t('modelAdm/oplata_transaction', 'Response Data'),
             'alias' => Yii::t('modelAdmoplata_transaction', 'Alias'),
             'created_at' => Yii::t('modelAdm/oplata_transaction', 'Created'),
+            'date_end' => Yii::t('modelAdm/oplata_transaction', 'Payment day'),
             'sent_email' => Yii::t('modelAdm/oplata_transaction', 'Email Sent'),
+            'remind_note' => Yii::t('modelAdm/oplata_transaction', 'Remind Note'),
         ];
     }
 

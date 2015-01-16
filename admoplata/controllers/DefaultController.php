@@ -88,6 +88,9 @@ class DefaultController extends Controller
         $logo = null;
         if (isset(Module::getInstance()->pdf['image']['src'])) {
             $logo = Html::img(Module::getInstance()->pdf['image']['src'], Module::getInstance()->pdf['image']);
+            if (isset(Module::getInstance()->pdf['imageLink']['href'])) {
+                $logo = Html::a($logo, Module::getInstance()->pdf['imageLink']['href']);
+            }
         }
 
         return $this->render('pdf',[

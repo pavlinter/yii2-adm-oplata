@@ -30,7 +30,9 @@ class m141222_111405_adm_oplata extends Migration
             'response_data' => Schema::TYPE_TEXT,
             'alias' =>  Schema::TYPE_STRING . "(32) NOT NULL",
             'created_at' => Schema::TYPE_TIMESTAMP . " NOT NULL",
+            'date_end' => Schema::TYPE_DATE . " NULL",
             'sent_email' => Schema::TYPE_SMALLINT . "(1) NOT NULL DEFAULT '0'",
+            'remind_note' => Schema::TYPE_SMALLINT . "(1) NOT NULL DEFAULT '0'",
         ], $tableOptions);
 
         $this->createIndex('user_id', '{{%oplata_transaction}}', 'user_id');

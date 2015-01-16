@@ -1,6 +1,7 @@
 <?php
 
 use pavlinter\admoplata\models\OplataTransaction;
+use pavlinter\admpages\Module;
 
 
 /* @var $this yii\web\View */
@@ -14,33 +15,48 @@ $td2        = 'border-top: 1px solid #ddd;text-align: right;padding: 3px;';
 $tdFirtsRow2= 'text-align: right;padding: 3px;';
 
 Yii::$app->getI18n()->disableDot();
-$this->title = Yii::t('adm/admoplata',"Invoice: #{id}, {title}", ['id' => $model->id, 'title' => $model->title]);
+$this->title = Module::t("print","Invoice: #{id}, {title}", ['id' => $model->id, 'title' => $model->title]);
 ?>
 
 
-<div>
-    <?= $logo ?>
+<div style="width: 100%;">
+    <div style="float: left;width: 55%;">
+        <?= $logo ?>
+    </div>
+    <div style="float: right;width: 30%;font-size: 20pt;padding: 20px 0px 0px 0px;text-align: left;">
+        <?= Module::t('print','Invoice No. {invoice-number}', [
+            'invoice-number' => $model->id,
+            'email' => $model->email,
+            'date' => Yii::$app->formatter->asDate($model->created_at),
+            'time' => Yii::$app->formatter->asTime($model->created_at),
+            'status' => $model::status_list($model->response_status),
+            'description' => nl2br($model->description),
+            'date_end' => Yii::$app->formatter->asDate($model->date_end),
+            'dot' => false,
+        ]); ?>
+    </div>
     <div style="clear: both;"></div>
     <br/>
 </div>
 
 <div style="width: 100%;">
     <div style="float: left;width: 55%;">
-        <?= Yii::t('adm/admoplata','<h5 class="lg-title mb10">From</h5><address>Web Services, Inc.</address>') ?>
+        <?= Module::t('print','From<br/>Web Services, Inc.') ?>
     </div>
     <div style="float: right;width: 30%;">
         <?php if ($model->user_id) {?>
-            <?= Yii::t('adm/admoplata','<h4 class="text-primary">Invoice No. {invoice-number}</h4>To: {email}<br/>Invoice Date: {date}<br/>Status: {status}<br/>{description}', [
+            <?= Module::t('print','Invoice No. {invoice-number}<br/>To: {email}<br/>Invoice Date: {date}<br/>Payment day: {date_end}<br/>{description}', [
                 'invoice-number' => $model->id,
                 'email' => $model->email,
                 'date' => Yii::$app->formatter->asDate($model->created_at),
                 'time' => Yii::$app->formatter->asTime($model->created_at),
                 'status' => $model::status_list($model->response_status),
                 'description' => nl2br($model->description),
+                'date_end' => Yii::$app->formatter->asDate($model->date_end),
                 'dot' => false,
             ]); ?>
         <?php } else {?>
-            <?= Yii::t('adm/admoplata','<h4 class="text-primary">Invoice No. {invoice-number}</h4>To: {person}<br/>Email: {email}<br/>Invoice Date: {date}<br/>Status: {status}<br/>{description}', [
+            <?= Module::t('print','Invoice No. {invoice-number}<br/>To: {person}<br/>Email: {email}<br/>Invoice Date: {date}<br/>Payment day: {date_end}<br/>{description}', [
                 'invoice-number' => $model->id,
                 'person' => $model->person,
                 'email' => $model->email,
@@ -48,6 +64,7 @@ $this->title = Yii::t('adm/admoplata',"Invoice: #{id}, {title}", ['id' => $model
                 'time' => Yii::$app->formatter->asTime($model->created_at),
                 'status' => $model::status_list($model->response_status),
                 'description' => nl2br($model->description),
+                'date_end' => Yii::$app->formatter->asDate($model->date_end),
                 'dot' => false,
             ]); ?>
         <?php }?>

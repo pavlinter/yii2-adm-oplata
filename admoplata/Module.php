@@ -35,7 +35,12 @@ class Module extends \yii\base\Module implements AdmBootstrapInterface
     public $mailTemplate = "@vendor/pavlinter/yii2-adm-oplata/admoplata/views/transaction/email-template";
 
     public $pdf = [
-        'image' => [], //htmlOptions
+        'image' => [ //htmlOptions
+            //'src' => '',
+        ],
+        'imageLink' => [ //htmlOptions
+            //'href' => '',
+        ],
     ];
     /**
      * @inheritdoc

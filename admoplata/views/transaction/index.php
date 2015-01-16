@@ -131,17 +131,43 @@ Yii::$app->i18n->resetDot();
                 'hAlign' => 'center',
             ],
             [
+                'attribute' => 'date_end',
+                'width' => '160px',
+                'filterType' => GridView::FILTER_DATE,
+                'filterWidgetOptions' => [
+                    'pluginOptions' => [
+                        'allowClear' => true,
+                        'todayHighlight' => true,
+                        'format' => 'yyyy-mm-dd',
+                    ],
+                ],
+                'vAlign' => 'middle',
+                'hAlign' => 'center',
+            ],
+            [
                 'attribute' => 'sent_email',
                 'width' => '120px',
                 'vAlign' => 'middle',
                 'hAlign' => 'center',
                 'format' => 'raw',
                 'value' => function ($model) {
-                    if ($model->sent_email || $model->response_status !== $model::STATUS_NOT_PAID) {
-                        return Html::tag('span', '', [
-                            'class' => 'glyphicon glyphicon-ok text-success',
+                    $remind = '';
+                    if ($model->remind_note) {
+                        $remind = '&nbsp;' . Html::tag('span', '', [
+                            'class' => 'fa fa-envelope-o text-success cursor-help',
+                            'data-toggle' => 'tooltip',
+                            'title' => Adm::t('admoplata', 'Remind note sent'),
                         ]);
                     }
+
+                    if ($model->sent_email || $model->response_status !== $model::STATUS_NOT_PAID) {
+                        return Html::tag('span', '', [
+                            'class' => 'glyphicon glyphicon-ok text-success cursor-help',
+                            'data-toggle' => 'tooltip',
+                            'title' => Adm::t('admoplata', 'Email Sent'),
+                        ]) . $remind;
+                    }
+
 
                     return \pavlinter\buttons\AjaxButton::widget([
                         'label' => Adm::t('oplata', 'Send'),
@@ -160,8 +186,10 @@ Yii::$app->i18n->resetDot();
                             }',
                         ],
                     ]) . Html::tag('span', '', [
-                        'class' => 'glyphicon glyphicon-ok text-success hide',
-                    ]);
+                        'class' => 'glyphicon glyphicon-ok text-success hide cursor-help',
+                        'data-toggle' => 'tooltip',
+                        'title' => Adm::t('admoplata', 'Email Sent'),
+                    ]) . $remind;
                 },
             ],
             [

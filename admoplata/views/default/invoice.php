@@ -25,17 +25,18 @@ $this->title = Yii::t('adm/admoplata',"Invoice: #{id}, {title}", ['id' => $model
                 <div class="col-sm-6 text-right">
                     <div>
                         <?php if ($model->user_id) {?>
-                            <?= Yii::t('adm/admoplata','<h4 class="text-primary">Invoice No. {invoice-number}</h4>To: {email}<br/>Invoice Date: {date}<br/>Status: {status}<br/>{description}', [
+                            <?= Yii::t('adm/admoplata','<h4 class="text-primary">Invoice No. {invoice-number}</h4>To: {email}<br/>Invoice Date: {date}<br/>Payment day: {date_end}<br/>Status: {status}<br/>{description}', [
                                 'invoice-number' => $model->id,
                                 'email' => $model->email,
                                 'date' => Yii::$app->formatter->asDate($model->created_at),
                                 'time' => Yii::$app->formatter->asTime($model->created_at),
                                 'status' => $model::status_list($model->response_status),
                                 'description' => nl2br($model->description),
+                                'date_end' => Yii::$app->formatter->asDate($model->date_end),
                                 'dot' => false,
                             ]); ?>
                         <?php } else {?>
-                            <?= Yii::t('adm/admoplata','<h4 class="text-primary">Invoice No. {invoice-number}</h4>To: {person}<br/>Email: {email}<br/>Invoice Date: {date}<br/>Status: {status}<br/>{description}', [
+                            <?= Yii::t('adm/admoplata','<h4 class="text-primary">Invoice No. {invoice-number}</h4>To: {person}<br/>Email: {email}<br/>Invoice Date: {date}<br/>Payment day: {date_end}<br/>Status: {status}<br/>{description}', [
                                 'invoice-number' => $model->id,
                                 'person' => $model->person,
                                 'email' => $model->email,
@@ -43,14 +44,15 @@ $this->title = Yii::t('adm/admoplata',"Invoice: #{id}, {title}", ['id' => $model
                                 'time' => Yii::$app->formatter->asTime($model->created_at),
                                 'status' => $model::status_list($model->response_status),
                                 'description' => nl2br($model->description),
+                                'date_end' => Yii::$app->formatter->asDate($model->date_end),
                                 'dot' => false,
                             ]); ?>
                         <?php }?>
 
-                        <?= Yii::t('adm/admoplata','<h4 class="text-primary">Invoice No. {invoice-number}</h4>To: {email}<br/>Invoice Date: {date}<br/>Status: {status}<br/>{description}', [
+                        <?= Yii::t('adm/admoplata','<h4 class="text-primary">Invoice No. {invoice-number}</h4>To: {email}<br/>Invoice Date: {date}<br/>Payment day: {date_end}<br/>Status: {status}<br/>{description}', [
                             'dot' => '.',
                         ]); ?>
-                        <?= Yii::t('adm/admoplata','<h4 class="text-primary">Invoice No. {invoice-number}</h4>To: {person}<br/>Email: {email}<br/>Invoice Date: {date}<br/>Status: {status}<br/>{description}', [
+                        <?= Yii::t('adm/admoplata','<h4 class="text-primary">Invoice No. {invoice-number}</h4>To: {person}<br/>Email: {email}<br/>Invoice Date: {date}<br/>Payment day: {date_end}<br/>Status: {status}<br/>{description}', [
                             'dot' => '.',
                         ]); ?>
                     </div>

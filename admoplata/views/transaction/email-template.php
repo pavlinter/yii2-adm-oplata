@@ -82,6 +82,10 @@ if (isset($enableDot)) {
                     <td><?=Yii::$app->formatter->asDatetime($model->created_at) ?></td>
                 </tr>
                 <tr>
+                    <td style="width: 50%;"><?= Adm::t('oplata/mail', "Payment day:") ?></td>
+                    <td><?=Yii::$app->formatter->asDatetime($model->date_end) ?></td>
+                </tr>
+                <tr>
                     <td style="width: 50%;"><?= Adm::t('oplata/mail', "Title:") ?></td>
                     <td><?= $model->title ?></td>
                 </tr>

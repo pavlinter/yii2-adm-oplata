@@ -126,25 +126,39 @@ SCRIPT;
                     </div>
 
                     <div class="row">
-                        <div class="col-sm-3">
+                        <div class="col-sm-4">
+                            <?= $form->field($model, 'payment_id')->textInput(['readonly' => true]) ?>
+                        </div>
+                        <div class="col-sm-4">
                             <?= $form->field($model, 'response_status')->widget(\kartik\widgets\Select2::classname(), [
                                 'data' => Module::getInstance()->manager->createOplataTransactionQuery('status_list'),
                             ]); ?>
                         </div>
-                        <div class="col-sm-3">
-                            <?= $form->field($model, 'payment_id')->textInput(['readonly' => true]) ?>
+                        <div class="col-sm-4">
+                            <?= $form->field($model, 'date_end')->widget(\kartik\date\DatePicker::className(), [
+                                'pluginOptions' => [
+                                    'allowClear' => true,
+                                    'todayHighlight' => true,
+                                    'format' => 'yyyy-mm-dd',
+                                ],
+                            ]); ?>
                         </div>
+                    </div>
+                    <div class="row">
 
-                        <div class="col-sm-3">
+                        <div class="col-sm-4">
                             <?= $form->field($model, 'language_id')->widget(\kartik\widgets\Select2::classname(), [
                                 'data' => \yii\helpers\ArrayHelper::map($languages, 'id', 'name'),
                             ]); ?>
                         </div>
-
-                        <div class="col-sm-3 form-without-label">
-
+                        <div class="col-sm-4 form-without-label">
                             <?php if (!$model->isNewRecord) {?>
                                 <?= $form->field($model, 'sent_email', ["template" => "{input}\n{label}\n{hint}\n{error}"])->widget(CheckboxX::classname(), ['pluginOptions'=>['threeState' => false]]); ?>
+                            <?php }?>
+                        </div>
+                        <div class="col-sm-4 form-without-label">
+                            <?php if (!$model->isNewRecord) {?>
+                                <?= $form->field($model, 'remind_note', ["template" => "{input}\n{label}\n{hint}\n{error}"])->widget(CheckboxX::classname(), ['pluginOptions'=>['threeState' => false]]); ?>
                             <?php }?>
                         </div>
                     </div>
@@ -232,7 +246,7 @@ $this->registerJs('
     if(disabledUpdate){
         $("#order-form").find(":input").prop("readonly",true);
         $(".mf-btn-close,.cloneBtn,.btnAct").hide();
-        $("#oplatatransaction-sent_email").checkboxX("refresh");
+        $(".cbx-container input").checkboxX("refresh");
     }
 
     $("#oplatatransaction-user_id").on("select2-selecting", function(e){
