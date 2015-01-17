@@ -111,6 +111,7 @@ class TransactionController extends Controller
                         $model->price += $item->price * $item->amount;
                     }
                     $model->save(false);
+                    Yii::$app->getSession()->setFlash('success', Adm::t('','Data successfully inserted!'));
 
                     $newId = [];
                     foreach ($items as $oldId => $item) {
@@ -185,6 +186,8 @@ class TransactionController extends Controller
                         }
 
                         $model->save(false);
+                        Yii::$app->getSession()->setFlash('success', Adm::t('','Data successfully changed!'));
+
                         foreach ($items as $oldId => $item) {
                             $item->oplata_transaction_id = $model->id;
                             $item->save(false);
@@ -226,7 +229,7 @@ class TransactionController extends Controller
     public function actionDelete($id)
     {
         $this->findModel($id)->delete();
-
+        Yii::$app->getSession()->setFlash('success', Adm::t('','Data successfully removed!'));
         return $this->redirect(['index']);
     }
 
@@ -289,8 +292,6 @@ class TransactionController extends Controller
                     ->where(['id' => $id])->one();
             };
         }
-
-
 
         $userTable      = forward_static_call(array(Adm::getInstance()->manager->userClass, 'tableName'));
         $out = ['more' => false];
