@@ -16,8 +16,7 @@
     ],
     "require": {
         "yiisoft/yii2": "*",
-        "pavlinter/yii2-multifields": "@dev",
-        "pavlinter/yii2-buttons": "@dev",
+        "pavlinter/yii2-multifields": "1.*",
         "robregonm/yii2-pdf": "1.*"
     },
     "autoload": {
