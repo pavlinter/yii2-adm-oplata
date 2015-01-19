@@ -458,7 +458,7 @@ class TransactionController extends Controller
     }
 
     /**
-     *
+     * For cron
      */
     public function actionCron()
     {
@@ -474,7 +474,6 @@ class TransactionController extends Controller
             'remind_note' => 0,
         ])->andWhere("NOW() > DATE_SUB(date_end, INTERVAL :day DAY) AND NOW() < date_end", ['day' => $module->remindDays]);
 
-        echo $query->createCommand()->getRawSql() . '<br />';
         foreach ($query->batch(10) as $models) {
             foreach ($models as $model) {
                 Yii::$app->getI18n()->changeLanguage($model->language_id);
@@ -493,7 +492,7 @@ class TransactionController extends Controller
                 ], [
                     'model' => $model,
                     'username' => $username,
-                ])->setTo("pavlinter@gmail.com") //$model->email
+                ])->setTo($model->email)
                     ->setFrom($module->sendFrom)
                     ->setSubject(Adm::t("oplata/remind", "Remind Payment Day", ['dot' => false]))
                     ->send();
@@ -501,11 +500,9 @@ class TransactionController extends Controller
                     $model->remind_note = 1;
                     $model->save(false);
                 }
-                echo $model->email . '<br />';
                 sleep(2);
-                break;
             }
-            break;
         }
+        return 'Success!';
     }
 }
