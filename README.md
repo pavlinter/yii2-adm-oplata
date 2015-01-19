@@ -45,6 +45,8 @@ https://www.oplata.com
         'sendFunc' => null; //function ($model, $module, $user, $username) {}
         'sendFrom' => null; // default Yii::$app->params['adminEmail']
         'mailTemplate' => '@vendor/pavlinter/yii2-adm-oplata/admoplata/views/transaction/email-template';
+        'remindTemplate' => '@vendor/pavlinter/yii2-adm-oplata/admoplata/views/transaction/remind-template',
+        'remindDays' => 1, //Высылать напоминание о платиже за 1 день до окончания счета /en/admoplata/transaction/cron
         'pdf' => [
             'image' => [ //logo htmlOptions
                 //'src' => '',
@@ -63,6 +65,11 @@ https://www.oplata.com
     ],
     ...
 ],
+```
+Ссылка для крона
+------------------
+```php
+/en/admoplata/transaction/cron
 ```
 
 Запустить миграцию

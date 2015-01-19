@@ -40,6 +40,8 @@ class Module extends \yii\base\Module implements AdmBootstrapInterface
 
     public $remindTemplate = "@vendor/pavlinter/yii2-adm-oplata/admoplata/views/transaction/remind-template";
 
+    public $remindDays = 1;
+
     public $pdf = [
         'image' => [ //htmlOptions
             //'src' => '',
@@ -49,7 +51,7 @@ class Module extends \yii\base\Module implements AdmBootstrapInterface
         ],
     ];
 
-    public $remindDays = 1;
+
 
     /**
      * @inheritdoc
