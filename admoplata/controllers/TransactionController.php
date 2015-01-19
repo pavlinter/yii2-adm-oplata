@@ -11,6 +11,7 @@ namespace pavlinter\admoplata\controllers;
 
 use pavlinter\adm\Adm;
 use pavlinter\adm\filters\AccessControl;
+use pavlinter\admoplata\models\OplataTransaction;
 use pavlinter\admoplata\Module;
 use pavlinter\multifields\ModelHelper;
 use Yii;
@@ -36,7 +37,11 @@ class TransactionController extends Controller
                 'rules' => [
                     [
                         'allow' => true,
-                        'actions' => ['index', 'user-list', 'mail'],
+                        'actions' => ['cron'],
+                    ],
+                    [
+                        'allow' => true,
+                        'actions' => ['index', 'user-list', 'mail', 'remind-template'],
                         'roles' => ['Adm-OplataRead'],
                     ],
                     [
@@ -351,6 +356,26 @@ class TransactionController extends Controller
     }
 
     /**
+     * @return string
+     */
+    public function actionRemindTemplate() {
+
+        $model = Module::getInstance()->manager->createOplataTransaction();
+        $this->layout = false;
+        $model->id = "xxxxxx";
+        $model->currency = "USD";
+        $model->email = "test@test.com";
+        $model->created_at = time();
+        $model->title = "test";
+
+        return $this->render(Module::getInstance()->remindTemplate,[
+            'model' => $model,
+            'enableDot' => true,
+            'username' => 'Jon',
+        ]);
+    }
+
+    /**
      * @throws NotFoundHttpException
      */
     public function actionSendEmail($id = null) {
@@ -384,9 +409,9 @@ class TransactionController extends Controller
                         'model' => $model,
                         'username' => $username,
                     ])->setTo($model->email)
-                        ->setFrom($module->sendFrom)
-                        ->setSubject(Adm::t("oplata", "Invoice Subject", ['dot' => false]))
-                        ->send();
+                    ->setFrom($module->sendFrom)
+                    ->setSubject(Adm::t("oplata", "Invoice Subject", ['dot' => false]))
+                    ->send();
             };
         } else {
             $sendFunc = $module->sendFunc;
@@ -429,6 +454,58 @@ class TransactionController extends Controller
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
+        }
+    }
+
+    /**
+     *
+     */
+    public function actionCron()
+    {
+        $module = Module::getInstance();
+        if (!$module->remindDays) {
+            return 'Remind Disabled';
+        }
+
+        $query = $module->manager->createOplataTransactionQuery();
+        /* @var \yii\db\Query $query */
+        $query->where([
+            'response_status' => OplataTransaction::STATUS_NOT_PAID,
+            'remind_note' => 0,
+        ])->andWhere("NOW() > DATE_SUB(date_end, INTERVAL :day DAY) AND NOW() < date_end", ['day' => $module->remindDays]);
+
+        echo $query->createCommand()->getRawSql() . '<br />';
+        foreach ($query->batch(10) as $models) {
+            foreach ($models as $model) {
+                Yii::$app->getI18n()->changeLanguage($model->language_id);
+                $username = '';
+                $user = null;
+                if ($model->user_id) {
+                    $user = $model->user;
+                    if ($user) {
+                        $username = $user->username;
+                    }
+                }
+
+                Yii::$app->mailer->htmlLayout = false;
+                $res = Yii::$app->mailer->compose([
+                    'html' => $module->remindTemplate,
+                ], [
+                    'model' => $model,
+                    'username' => $username,
+                ])->setTo("pavlinter@gmail.com") //$model->email
+                    ->setFrom($module->sendFrom)
+                    ->setSubject(Adm::t("oplata/remind", "Remind Payment Day", ['dot' => false]))
+                    ->send();
+                if ($res) {
+                    $model->remind_note = 1;
+                    $model->save(false);
+                }
+                echo $model->email . '<br />';
+                sleep(2);
+                break;
+            }
+            break;
         }
     }
 }

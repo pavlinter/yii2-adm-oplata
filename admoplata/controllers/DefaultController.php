@@ -186,5 +186,4 @@ class DefaultController extends Controller
             }
         }
     }
-
 }

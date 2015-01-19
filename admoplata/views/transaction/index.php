@@ -22,6 +22,7 @@ Yii::$app->i18n->resetDot();
     <p>
         <?= Html::a(Adm::t('oplata', 'Create Order', ['dot' => true]), ['create'], ['class' => 'btn btn-primary']) ?>
         <?= Html::a(Adm::t('oplata', 'Email Template', ['dot' => true]), ['mail'], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a(Adm::t('oplata', 'Remind Note Template', ['dot' => true]), ['remind-template'], ['class' => 'btn btn-primary']) ?>
     </p>
 
     <?php Yii::$app->i18n->disableDot();?>
