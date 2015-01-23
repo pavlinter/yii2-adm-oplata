@@ -32,9 +32,13 @@ class Module extends \yii\base\Module implements AdmBootstrapInterface
         'querySearch' => null, // function ($query, $userTable, $search) {/* @var \yii\db\Query $query */return $query->from($userTable)->where(['like', 'email', $search])->limit(20)->all();}
         'queryLoad' => null, //function ($query, $userTable, $id) {/* @var \yii\db\Query $query */return $query->from($userTable)->where(['id' => $id])->one();}
     ];
-
+    /**
+     * @var \Closure|array
+     */
     public $methodList = [];
-
+    /**
+     * @var \Closure
+     */
     public $sendFunc = null; //function ($model, $module, $user, $username) {}
 
     public $sendFrom = null; // default Yii::$app->params['adminEmail']
@@ -76,19 +80,25 @@ class Module extends \yii\base\Module implements AdmBootstrapInterface
         parent::init();
         $this->registerTranslations();
         if ($this->userSelect['viewCallback'] !== null && !is_callable($this->userSelect['viewCallback'])) {
-            throw new InvalidConfigException('The "viewCallback" property must be callable.');
+            throw new InvalidConfigException('The "viewCallback" property must be closure.');
         }
         if ($this->userSelect['querySearch'] !== null && !is_callable($this->userSelect['querySearch'])) {
-            throw new InvalidConfigException('The "querySearch" property must be callable.');
+            throw new InvalidConfigException('The "querySearch" property must be closure.');
         }
         if ($this->userSelect['queryLoad'] !== null && !is_callable($this->userSelect['queryLoad'])) {
-            throw new InvalidConfigException('The "queryLoad" property must be callable.');
+            throw new InvalidConfigException('The "queryLoad" property must be closure.');
         }
 
         if($this->sendFrom === null){
             $this->sendFrom = Yii::$app->params['adminEmail'];
         }
-        
+
+        if ($this->methodList instanceof \Closure) {
+            $this->methodList = call_user_func($this->methodList, $this);
+        } else if(!is_array($this->methodList)) {
+            throw new InvalidConfigException('The "methodList" property must be closure or array.');
+        }
+
         if (!isset($this->methodList[OplataTransaction::METHOD_OPLATA])) {
             $this->methodList[OplataTransaction::METHOD_OPLATA] = Yii::t('modelAdm/oplata_method', 'oplata.com');
         }
