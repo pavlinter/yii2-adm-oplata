@@ -6,6 +6,7 @@ use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use pavlinter\adm\Adm;
 use yii\helpers\Url;
+use yii\web\JsExpression;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\OplataTransactionSearch */
@@ -117,6 +118,7 @@ Yii::$app->i18n->resetDot();
                 },
                 'filterWidgetOptions' => [
                     'pluginOptions' => [
+                        'escapeMarkup' => new JsExpression('function (m) { return m; }'),
                         'allowClear' => true,
                         'minimumResultsForSearch' => -1,
                     ],
