@@ -24,6 +24,7 @@ class m141222_111405_adm_oplata extends Migration
             'price' => Schema::TYPE_DECIMAL . "(7,2) NOT NULL",
             'shipping' => Schema::TYPE_DECIMAL . "(7,2) NOT NULL DEFAULT '0.00'",
             'currency' => Schema::TYPE_STRING . "(3) NOT NULL",
+            'method' => Schema::TYPE_STRING . "(50) DEFAULT NULL",
             'order_status' => Schema::TYPE_STRING . "(50) DEFAULT NULL",
             'response_status' => Schema::TYPE_STRING . "(50) NOT NULL",
             'data' => Schema::TYPE_TEXT,

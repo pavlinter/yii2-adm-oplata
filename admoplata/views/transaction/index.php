@@ -2,6 +2,7 @@
 
 use kartik\grid\GridView;
 use pavlinter\admoplata\Module;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use pavlinter\adm\Adm;
 use yii\helpers\Url;
@@ -86,7 +87,10 @@ Yii::$app->i18n->resetDot();
                     }
                 },
                 'filterWidgetOptions' => [
-                    'pluginOptions' => ['allowClear' => true ],
+                    'pluginOptions' => [
+                        'allowClear' => true,
+                        'minimumResultsForSearch' => -1,
+                    ],
                 ],
                 'filterInputOptions' => ['placeholder' => Adm::t('','Select ...', ['dot' => false])],
                 'format' => 'raw'
@@ -112,7 +116,31 @@ Yii::$app->i18n->resetDot();
                     }
                 },
                 'filterWidgetOptions' => [
-                    'pluginOptions' => ['allowClear' =>true ],
+                    'pluginOptions' => [
+                        'allowClear' => true,
+                        'minimumResultsForSearch' => -1,
+                    ],
+                ],
+                'filterInputOptions' => ['placeholder' => Adm::t('','Select ...', ['dot' => false])],
+                'format' => 'raw'
+            ],
+            [
+                'attribute' => 'method',
+                'vAlign' => 'middle',
+                'hAlign' => 'center',
+                'filterType' => GridView::FILTER_SELECT2,
+                'filter'=> ArrayHelper::merge(['null' => Yii::t('yii', '(not set)')], Module::getInstance()->manager->createOplataTransactionQuery('method_list')) ,
+                'value' => function ($model) {
+                    if (!empty($model->response_status)) {
+                        $text = Module::getInstance()->manager->createOplataTransactionQuery('method_list', $model->method);
+                        return $text;
+                    }
+                },
+                'filterWidgetOptions' => [
+                    'pluginOptions' => [
+                        'allowClear' => true,
+                        'minimumResultsForSearch' => -1,
+                    ],
                 ],
                 'filterInputOptions' => ['placeholder' => Adm::t('','Select ...', ['dot' => false])],
                 'format' => 'raw'
@@ -195,7 +223,7 @@ Yii::$app->i18n->resetDot();
             ],
             [
                 'class' => '\kartik\grid\ActionColumn',
-                'width' => '130px',
+                'width' => '100px',
                 'template' => '{pay} {view} {update} {delete}',
                 'buttons' => [
                     'view' => function ($url, $model) {

@@ -25,7 +25,7 @@ class OplataTransactionSearch extends OplataTransaction
     {
         return [
             [['id', 'user_id', 'payment_id'], 'integer'],
-            [['email', 'currency', 'order_status', 'response_status', 'created_at', 'date_end'], 'safe'],
+            [['email', 'currency', 'order_status', 'response_status', 'created_at', 'date_end', 'method'], 'safe'],
             [['price', 'shipping'], 'number'],
         ];
     }
@@ -72,8 +72,6 @@ class OplataTransactionSearch extends OplataTransaction
             'sent_email' => $this->sent_email,
         ]);
 
-
-
         $query->andFilterWhere(['like', 'email', $this->email])
             ->andFilterWhere(['like', 'currency', $this->currency])
             ->andFilterWhere(['like', 'order_status', $this->order_status])
@@ -84,7 +82,13 @@ class OplataTransactionSearch extends OplataTransaction
             $query->andWhere('DATE(created_at) = :date', ['date' => $this->created_at]);
         }
 
-
+        if ($this->method === 'null') {
+            $query->andWhere('method IS NULL');
+        } else {
+            $query->andFilterWhere([
+                'method' => $this->method,
+            ]);
+        }
 
         return $dataProvider;
     }

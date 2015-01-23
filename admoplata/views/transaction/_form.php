@@ -146,22 +146,34 @@ SCRIPT;
                     </div>
                     <div class="row">
 
-                        <div class="col-sm-4">
+                        <div class="col-sm-6">
                             <?= $form->field($model, 'language_id')->widget(\kartik\widgets\Select2::classname(), [
                                 'data' => \yii\helpers\ArrayHelper::map($languages, 'id', 'name'),
                             ]); ?>
                         </div>
-                        <div class="col-sm-4 form-without-label">
+                        <div class="col-sm-6">
                             <?php if (!$model->isNewRecord) {?>
-                                <?= $form->field($model, 'sent_email', ["template" => "{input}\n{label}\n{hint}\n{error}"])->widget(CheckboxX::classname(), ['pluginOptions'=>['threeState' => false]]); ?>
-                            <?php }?>
-                        </div>
-                        <div class="col-sm-4 form-without-label">
-                            <?php if (!$model->isNewRecord) {?>
-                                <?= $form->field($model, 'remind_note', ["template" => "{input}\n{label}\n{hint}\n{error}"])->widget(CheckboxX::classname(), ['pluginOptions'=>['threeState' => false]]); ?>
+                                <?= $form->field($model, 'method')->widget(\kartik\widgets\Select2::classname(), [
+                                    'data' => $model->method_list(),
+                                    'options' => ['placeholder' => Adm::t('','Select ...', ['dot' => false])],
+                                    'pluginOptions' => [
+                                        'allowClear' => true,
+                                    ],
+                                ]); ?>
                             <?php }?>
                         </div>
                     </div>
+
+                    <?php if (!$model->isNewRecord) {?>
+                    <div class="row">
+                        <div class="col-sm-6 form-without-label">
+                            <?= $form->field($model, 'sent_email', ["template" => "{input}\n{label}\n{hint}\n{error}"])->widget(CheckboxX::classname(), ['pluginOptions'=>['threeState' => false]]); ?>
+                        </div>
+                        <div class="col-sm-6 form-without-label">
+                            <?= $form->field($model, 'remind_note', ["template" => "{input}\n{label}\n{hint}\n{error}"])->widget(CheckboxX::classname(), ['pluginOptions'=>['threeState' => false]]); ?>
+                        </div>
+                    </div>
+                    <?php }?>
 
                 </section>
             </section>

@@ -11,6 +11,7 @@ namespace pavlinter\admoplata;
 
 use pavlinter\adm\Adm;
 use pavlinter\adm\AdmBootstrapInterface;
+use pavlinter\admoplata\models\OplataTransaction;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\helpers\ArrayHelper;
@@ -31,6 +32,8 @@ class Module extends \yii\base\Module implements AdmBootstrapInterface
         'querySearch' => null, // function ($query, $userTable, $search) {/* @var \yii\db\Query $query */return $query->from($userTable)->where(['like', 'email', $search])->limit(20)->all();}
         'queryLoad' => null, //function ($query, $userTable, $id) {/* @var \yii\db\Query $query */return $query->from($userTable)->where(['id' => $id])->one();}
     ];
+
+    public $methodList = [];
 
     public $sendFunc = null; //function ($model, $module, $user, $username) {}
 
@@ -70,6 +73,8 @@ class Module extends \yii\base\Module implements AdmBootstrapInterface
 
     public function init()
     {
+        parent::init();
+        $this->registerTranslations();
         if ($this->userSelect['viewCallback'] !== null && !is_callable($this->userSelect['viewCallback'])) {
             throw new InvalidConfigException('The "viewCallback" property must be callable.');
         }
@@ -83,9 +88,10 @@ class Module extends \yii\base\Module implements AdmBootstrapInterface
         if($this->sendFrom === null){
             $this->sendFrom = Yii::$app->params['adminEmail'];
         }
-
-        parent::init();
-        // custom initialization code goes here
+        
+        if (!isset($this->methodList[OplataTransaction::METHOD_OPLATA])) {
+            $this->methodList[OplataTransaction::METHOD_OPLATA] = Yii::t('modelAdm/oplata_method', 'oplata.com');
+        }
     }
 
     /**

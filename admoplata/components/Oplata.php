@@ -191,6 +191,7 @@ class Oplata extends Component
             $order->order_status = $response['order_status'];
             $order->response_status = $response['response_status'];
             $order->response_data = $data;
+            $order->method = OplataTransaction::METHOD_OPLATA;
             if (!$order->save(false)) {
                 $this->setError('Error 6: #{order_id}, status: {order_status}', $response);
                 return false;

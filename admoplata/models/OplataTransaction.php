@@ -29,6 +29,7 @@ use yii\db\Expression;
  * @property string $price
  * @property string $shipping
  * @property string $currency
+ * @property string $method
  * @property string $order_status
  * @property string $response_status
  * @property string $data
@@ -45,6 +46,8 @@ use yii\db\Expression;
  */
 class OplataTransaction extends \yii\db\ActiveRecord
 {
+    const METHOD_OPLATA = "oplata.com";
+
     const CURRENCY_EUR = "EUR";
     const CURRENCY_USD = "USD";
     const CURRENCY_RUB = "RUB";
@@ -84,14 +87,16 @@ class OplataTransaction extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
+            [['method'], 'default', 'value' => null],
             [['user_id', 'payment_id', 'language_id'], 'integer'],
             [['price', 'currency','response_status', 'alias', 'title', 'language_id'], 'required'],
             [['price', 'shipping'], 'double'],
             [['email'], 'email'],
             [['currency'], 'in', 'range' => array_keys(self::currency_list())],
             [['response_status'], 'in', 'range' => array_keys(self::status_list())],
+            [['method'], 'in', 'range' => array_keys(self::method_list())],
             [['data', 'response_data'], 'safe'],
-            [['order_status', 'response_status'], 'string', 'max' => 50],
+            [['order_status', 'response_status', 'method'], 'string', 'max' => 50],
             [['title'], 'string', 'max' => 1024],
             [['description'], 'string'],
             [['email', 'person'], 'string', 'max' => 255],
@@ -107,9 +112,9 @@ class OplataTransaction extends \yii\db\ActiveRecord
     public function scenarios()
     {
         $scenarios = parent::scenarios();
-        $scenarios['createOrder'] = ['user_id', 'email', 'shipping', 'data', 'title',  'description', 'currency', 'language_id'];
-        $scenarios['admCreate'] = ['user_id', 'email', 'person', 'title', 'description', 'shipping', 'currency', 'language_id', 'response_status' , 'date_end'];
-        $scenarios['admUpdate'] = ['user_id', 'email', 'person', 'title', 'description', 'shipping', 'currency', 'language_id', 'sent_email', 'remind_note', 'response_status', 'date_end'];
+        $scenarios['createOrder'] = ['user_id', 'email', 'shipping', 'data', 'title',  'description', 'currency', 'language_id', 'method'];
+        $scenarios['admCreate'] = ['user_id', 'email', 'person', 'title', 'description', 'shipping', 'currency', 'language_id', 'response_status' , 'date_end', 'method'];
+        $scenarios['admUpdate'] = ['user_id', 'email', 'person', 'title', 'description', 'shipping', 'currency', 'language_id', 'sent_email', 'remind_note', 'response_status', 'date_end', 'method'];
 
         return $scenarios;
     }
@@ -133,6 +138,7 @@ class OplataTransaction extends \yii\db\ActiveRecord
                 $this->email = $this->user->email;
             }
         }
+
         return parent::beforeSave($insert);
     }
 
@@ -170,6 +176,7 @@ class OplataTransaction extends \yii\db\ActiveRecord
             'price' => Yii::t('modelAdm/oplata_transaction', 'Price'),
             'shipping' => Yii::t('modelAdm/oplata_transaction', 'Shipping'),
             'currency' => Yii::t('modelAdm/oplata_transaction', 'Currency'),
+            'method' => Yii::t('modelAdm/oplata_transaction', 'Method'),
             'order_status' => Yii::t('modelAdm/oplata_transaction', 'Order Status'),
             'response_status' => Yii::t('modelAdm/oplata_transaction', 'Status'),
             'data' => Yii::t('modelAdm/oplata_transaction', 'Data'),
@@ -242,6 +249,26 @@ class OplataTransaction extends \yii\db\ActiveRecord
         if ($status !== false) {
             if (isset($list[$status])) {
                 return $list[$status];
+            }
+            return null;
+        }
+        return $list;
+    }
+
+    /**
+     * @param bool $method
+     * @return array|null
+     */
+    public static function method_list($method = false)
+    {
+        $module = Module::getInstance();
+        if ($module) {
+            $module = Yii::$app->getModule('admoplata');
+        }
+        $list = $module->methodList;
+        if ($method !== false) {
+            if (isset($list[$method])) {
+                return $list[$method];
             }
             return null;
         }
