@@ -97,7 +97,7 @@ class Module extends \yii\base\Module implements AdmBootstrapInterface
         } elseif ($this->sendFrom === null) {
             $this->sendFrom = Yii::$app->params['adminEmail'];
         }
-        
+
         if ($this->methodList instanceof Closure) {
             $this->methodList = call_user_func($this->methodList, $this);
         } else if(!is_array($this->methodList)) {
