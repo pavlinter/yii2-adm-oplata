@@ -9,6 +9,7 @@
 
 namespace pavlinter\admoplata;
 
+use Closure;
 use pavlinter\adm\Adm;
 use pavlinter\adm\AdmBootstrapInterface;
 use pavlinter\admoplata\models\OplataTransaction;
@@ -33,14 +34,16 @@ class Module extends \yii\base\Module implements AdmBootstrapInterface
         'queryLoad' => null, //function ($query, $userTable, $id) {/* @var \yii\db\Query $query */return $query->from($userTable)->where(['id' => $id])->one();}
     ];
     /**
-     * @var \Closure|array
+     * @var Closure|array
      */
     public $methodList = [];
     /**
-     * @var \Closure
+     * @var Closure
      */
     public $sendFunc = null; //function ($model, $module, $user, $username) {}
-
+    /**
+     * @var Closure|string
+     */
     public $sendFrom = null; // default Yii::$app->params['adminEmail']
 
     public $mailTemplate = "@vendor/pavlinter/yii2-adm-oplata/admoplata/views/transaction/email-template";
@@ -89,11 +92,13 @@ class Module extends \yii\base\Module implements AdmBootstrapInterface
             throw new InvalidConfigException('The "queryLoad" property must be closure.');
         }
 
-        if($this->sendFrom === null){
+        if ($this->sendFrom instanceof Closure) {
+            $this->sendFrom = call_user_func($this->sendFrom, $this);
+        } elseif ($this->sendFrom === null) {
             $this->sendFrom = Yii::$app->params['adminEmail'];
         }
-
-        if ($this->methodList instanceof \Closure) {
+        
+        if ($this->methodList instanceof Closure) {
             $this->methodList = call_user_func($this->methodList, $this);
         } else if(!is_array($this->methodList)) {
             throw new InvalidConfigException('The "methodList" property must be closure or array.');
