@@ -82,13 +82,21 @@ class Module extends \yii\base\Module implements AdmBootstrapInterface
     {
         parent::init();
         $this->registerTranslations();
-        if ($this->userSelect['viewCallback'] !== null && !is_callable($this->userSelect['viewCallback'])) {
+
+        $this->userSelect = ArrayHelper::merge([
+            'viewCallback' => null,
+            'querySearch' => null,
+            'queryLoad' => null,
+        ], $this->userSelect);
+
+
+        if ($this->userSelect['viewCallback'] !== null && !($this->userSelect['viewCallback'] instanceof Closure)) {
             throw new InvalidConfigException('The "viewCallback" property must be closure.');
         }
-        if ($this->userSelect['querySearch'] !== null && !is_callable($this->userSelect['querySearch'])) {
+        if ($this->userSelect['querySearch'] !== null && !($this->userSelect['querySearch'] instanceof Closure)) {
             throw new InvalidConfigException('The "querySearch" property must be closure.');
         }
-        if ($this->userSelect['queryLoad'] !== null && !is_callable($this->userSelect['queryLoad'])) {
+        if ($this->userSelect['queryLoad'] !== null && !($this->userSelect['queryLoad'] instanceof Closure)) {
             throw new InvalidConfigException('The "queryLoad" property must be closure.');
         }
 
