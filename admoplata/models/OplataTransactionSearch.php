@@ -48,7 +48,7 @@ class OplataTransactionSearch extends OplataTransaction
      */
     public function search($params)
     {
-        $query = self::find()->with(['user']);
+        $query = static::find()->with(['user']);
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
