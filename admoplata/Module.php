@@ -113,7 +113,7 @@ class Module extends \yii\base\Module implements AdmBootstrapInterface
         }
 
         if (!isset($this->methodList[OplataTransaction::METHOD_OPLATA])) {
-            $this->methodList[OplataTransaction::METHOD_OPLATA] = Yii::t('modelAdm/oplata_method', 'oplata.com');
+            $this->methodList[OplataTransaction::METHOD_OPLATA] = Yii::t('admoplata/oplata_method', 'oplata.com');
         }
     }
 
