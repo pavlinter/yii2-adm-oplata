@@ -41,17 +41,17 @@ class TransactionController extends Controller
                     ],
                     [
                         'allow' => true,
-                        'actions' => ['index', 'user-list', 'mail', 'remind-template'],
+                        'actions' => ['index', 'user-list', 'mail', 'remind-template', 'overdue-template'],
                         'roles' => ['Adm-OplataRead'],
                     ],
                     [
                         'allow' => true,
-                        'actions' => ['create', 'send-email'],
+                        'actions' => ['create', 'send-email', 'send-overdue'],
                         'roles' => ['Adm-OplataCreate'],
                     ],
                     [
                         'allow' => true,
-                        'actions' => ['update', 'send-email'],
+                        'actions' => ['update', 'send-email', 'send-overdue'],
                         'roles' => ['Adm-OplataUpdate'],
                     ],
                     [
@@ -356,8 +356,8 @@ class TransactionController extends Controller
     }
 
     /**
-     * @return string
-     */
+ * @return string
+ */
     public function actionRemindTemplate() {
 
         $model = Module::getInstance()->manager->createOplataTransaction();
@@ -376,6 +376,29 @@ class TransactionController extends Controller
     }
 
     /**
+     * @return string
+     */
+    public function actionOverdueTemplate() {
+
+        $model = Module::getInstance()->manager->createOplataTransaction();
+        $this->layout = false;
+        $model->id = "xxxxxx";
+        $model->currency = "USD";
+        $model->email = "test@test.com";
+        $model->created_at = time();
+        $model->title = "test";
+
+        return $this->render(Module::getInstance()->overdueTemplate,[
+            'model' => $model,
+            'enableDot' => true,
+            'username' => 'William',
+        ]);
+    }
+
+
+    /**
+     * @param null $id
+     * @return string|Response
      * @throws NotFoundHttpException
      */
     public function actionSendEmail($id = null) {
@@ -425,7 +448,7 @@ class TransactionController extends Controller
             }
         }
 
-        if ($sendFunc($model, $module, $user , $username)) {
+        if (call_user_func($sendFunc, $model, $module, $user, $username)) {
             $model->sent_email = 1;
             if (!$model->save(false)) {
                 $json['r'] = 0;
@@ -440,6 +463,68 @@ class TransactionController extends Controller
         return Json::encode($json);
     }
 
+
+    /**
+     * @param null $id
+     * @return string|Response
+     * @throws NotFoundHttpException
+     */
+    public function actionSendOverdue($id = null) {
+        $json['r'] = 1;
+        if ($id === null) {
+            $order_id = Yii::$app->request->post('id');
+        } else {
+            $order_id = $id;
+        }
+        exit('dd');
+        if (!$order_id) {
+            if ($id !== null) {
+                return $this->redirect(['index']);
+            }
+            $json['r'] = 0;
+            return Json::encode($json);
+        }
+
+        $model = $this->findModel($order_id);
+        $currentLang = Yii::$app->getI18n()->getId();
+        Yii::$app->getI18n()->changeLanguage($model->language_id);
+
+        $module = Module::getInstance();
+
+        if ($module->overdueFunc === null) {
+            $module->overdueFunc = function ($model, $module, $user, $username) {
+                Yii::$app->mailer->htmlLayout = false;
+                return Yii::$app->mailer->compose([
+                    'html' => $module->overdueTemplate,
+                ], [
+                    'model' => $model,
+                    'username' => $username,
+                ])->setTo($model->email)
+                    ->setFrom($module->sendFrom)
+                    ->setSubject(Adm::t("oplata/overdue", "Overdue Payment", ['dot' => false]))
+                    ->send();
+            };
+        }
+        $username = '';
+        $user = null;
+        if ($model->user_id) {
+            $user = $model->user;
+            if ($user) {
+                $username = $user->username;
+            }
+        }
+
+        if (!call_user_func($module->overdueFunc, $model, $module, $user, $username)) {
+            $json['r'] = 0;
+        }
+        if ($id !== null) {
+            Yii::$app->getI18n()->changeLanguage($currentLang);
+            return $this->redirect(['index']);
+        } else {
+            $json['text'] = Adm::t('oplata/overdue', "domain.com");
+        }
+        return Json::encode($json);
+    }
     /**
      * Finds the OplataTransaction model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.

@@ -42,6 +42,10 @@ class Module extends \yii\base\Module implements AdmBootstrapInterface
      */
     public $sendFunc = null; //function ($model, $module, $user, $username) {}
     /**
+     * @var Closure
+     */
+    public $overdueFunc = null; //function ($model, $module, $user, $username) {}
+    /**
      * @var Closure|string
      */
     public $sendFrom = null; // default Yii::$app->params['adminEmail']
@@ -49,6 +53,8 @@ class Module extends \yii\base\Module implements AdmBootstrapInterface
     public $mailTemplate = "@vendor/pavlinter/yii2-adm-oplata/admoplata/views/transaction/email-template";
 
     public $remindTemplate = "@vendor/pavlinter/yii2-adm-oplata/admoplata/views/transaction/remind-template";
+
+    public $overdueTemplate = "@vendor/pavlinter/yii2-adm-oplata/admoplata/views/transaction/overdue-template";
 
     public $remindDays = 1;
 
