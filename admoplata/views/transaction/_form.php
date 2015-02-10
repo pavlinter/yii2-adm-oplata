@@ -56,7 +56,7 @@ foreach ($attributes as $attribute) {
                             <?php
 
                             $url = Url::to(['user-list']);
-                            $initScript = <<< SCRIPT
+                            $initScript = <<<SCRIPT
                             function (element, callback) {
                                 var id=\$(element).val();
                                 if (id !== "") {
@@ -236,6 +236,32 @@ SCRIPT;
             <div class="col-xs-6">
                 <?= Html::submitButton($model->isNewRecord ? Adm::t('oplata', 'Create', ['dot' => false]) : Adm::t('oplata', 'Update', ['dot' => false]), ['class' => 'btn btn-primary btnAct btnSimple']) ?>
                 <?= Html::submitButton($model->isNewRecord ? Adm::t('oplata', 'Create And Send', ['dot' => false]) : Adm::t('oplata', 'Update And Send', ['dot' => false]), ['class' => 'btn btn-primary btnAct btnSend']) ?>
+
+                <?php if (!$model->isNewRecord && strtotime($model->date_end) <= time()) {?>
+                    <div class="pull-right">
+                        <?= \pavlinter\buttons\AjaxButton::widget([
+                            'label' => Adm::t('oplata', 'Send overdue payment', ['dot' => false]),
+                            'options' => [
+                                'class' => 'btn btn-primary overdueBtn',
+                            ],
+                            'ajaxOptions' => [
+                                'url' => Url::to(['send-overdue']),
+                                'data' => ['id' => $model->id],
+                                'done' => 'function(d){
+                                    if(d.r){
+                                        var $alert = $("<div class=\"alert alert-" + d.alertType + "\"><button class=\"close\" data-dismiss=\"alert\">&times;</button>" + d.text + "</div>");
+                                        $(".wrapper h1").after($alert);
+                                        $("html, body").animate({
+                                            scrollTop: 0
+                                        }, 1000);
+                                    }
+                                }',
+                            ],
+                        ]); ?>
+                    </div>
+                <?php }?>
+
+
             </div>
             <div class="col-xs-6">
                 <a class="btn btn-s-md btn-white cloneBtn" href="javascript:void(0);">
@@ -257,7 +283,7 @@ $this->registerJs('
     var disabledUpdate = ' . (!$model->isNewRecord && $model->order_status !== null ? 'true' : 'false') . ';
     if(disabledUpdate){
         $("#order-form").find(":input").prop("readonly",true);
-        $(".mf-btn-close,.cloneBtn,.btnAct").hide();
+        $(".mf-btn-close,.cloneBtn,.btnAct,.overdueBtn").hide();
         $(".cbx-container input").checkboxX("refresh");
     }
 

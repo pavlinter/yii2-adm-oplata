@@ -465,22 +465,14 @@ class TransactionController extends Controller
 
 
     /**
-     * @param null $id
      * @return string|Response
      * @throws NotFoundHttpException
      */
-    public function actionSendOverdue($id = null) {
+    public function actionSendOverdue() {
         $json['r'] = 1;
-        if ($id === null) {
-            $order_id = Yii::$app->request->post('id');
-        } else {
-            $order_id = $id;
-        }
-        exit('dd');
+        $order_id = Yii::$app->request->post('id');
+
         if (!$order_id) {
-            if ($id !== null) {
-                return $this->redirect(['index']);
-            }
             $json['r'] = 0;
             return Json::encode($json);
         }
@@ -513,15 +505,14 @@ class TransactionController extends Controller
                 $username = $user->username;
             }
         }
-
-        if (!call_user_func($module->overdueFunc, $model, $module, $user, $username)) {
-            $json['r'] = 0;
-        }
-        if ($id !== null) {
-            Yii::$app->getI18n()->changeLanguage($currentLang);
-            return $this->redirect(['index']);
+        $res = call_user_func($module->overdueFunc, $model, $module, $user, $username);
+        Yii::$app->getI18n()->changeLanguage($currentLang);
+        if ($res) {
+            $json['alertType'] = 'success';
+            $json['text'] = Adm::t('oplata/overdue', "Overdue payment sent to {email}.", ['email' => $model->email, 'dot' => true]);
         } else {
-            $json['text'] = Adm::t('oplata/overdue', "domain.com");
+            $json['text'] = Adm::t('oplata/overdue', "Oops! Something went wrong.", ['dot' => true]);
+            $json['alertType'] = 'danger';
         }
         return Json::encode($json);
     }
