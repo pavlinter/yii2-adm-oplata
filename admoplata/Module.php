@@ -66,9 +66,7 @@ class Module extends \yii\base\Module implements AdmBootstrapInterface
             //'href' => '',
         ],
     ];
-
-
-
+    
     /**
      * @inheritdoc
      */
