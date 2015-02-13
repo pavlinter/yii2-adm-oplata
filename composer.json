@@ -14,6 +14,7 @@
             "email": "pavlinter@gmail.com"
         }
     ],
+    "minimum-stability": "stable",
     "require": {
         "yiisoft/yii2": "*",
         "pavlinter/yii2-multifields": "1.0.0",
