@@ -32,7 +32,7 @@ class DefaultController extends Controller
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
-                    'response' => ['post'],
+                    'server-paypal' => ['post'],
                     'server' => ['post'],
                 ],
             ],
@@ -163,6 +163,7 @@ class DefaultController extends Controller
      */
     public function actionResponse($alias = null)
     {
+
         if ($alias) {
             $where = ['alias' => $alias];
         } else {
@@ -186,13 +187,12 @@ class DefaultController extends Controller
      */
     public function actionServer()
     {
-        $res = Yii::$app->oplata->checkPayment(Yii::$app->request->post());
-        if (!$res) {
-            $errors = Yii::$app->oplata->getErrors();
-            foreach ($errors as $error) {
-                Yii::warning($error, 'admoplata');
-            }
+        Yii::$app->oplata->checkPayment(Yii::$app->request->post());
+        $errors = Yii::$app->oplata->getErrors();
+        foreach ($errors as $error) {
+            Yii::error($error, 'admoplata');
         }
+
     }
 
     /**
@@ -229,13 +229,10 @@ class DefaultController extends Controller
             'amount' => $model->price + $model->shipping,
         ]);
 
-        $redirect = Yii::$app->oplata->paypalUrl . '?' . $params;
+        $redirect = 'https://www.paypal.com/cgi-bin/webscr?' . $params;
 
-        //return $redirect;
         return $this->redirect($redirect);
-
         //Redirect("?cmd=_xclick&business=xxxxxxxxx&currency_code=".$currency_code."&return=".$url."&cancel_ return=".$cancel_url."&cbt=".$merchant_button."&custom=".$login."&quantity=1&lc=LV&item_name=".$item_name."&amount=".$price);
-
     }
 
     /**
@@ -243,12 +240,11 @@ class DefaultController extends Controller
      */
     public function actionServerPaypal()
     {
-        $res = Yii::$app->oplata->checkPaymentPaypal(Yii::$app->request->post());
-        if (!$res) {
-            $errors = Yii::$app->oplata->getErrors();
-            foreach ($errors as $error) {
-                Yii::warning($error, 'admoplata');
-            }
+        Yii::$app->oplata->checkPaymentPaypal(Yii::$app->request->post());
+        $errors = Yii::$app->oplata->getErrors();
+        foreach ($errors as $error) {
+            Yii::error($error, 'admoplata');
         }
+
     }
 }
