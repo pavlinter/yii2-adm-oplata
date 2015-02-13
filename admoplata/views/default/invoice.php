@@ -112,10 +112,20 @@ $this->title = Yii::t('adm/admoplata',"Invoice: #{id}, {title}", ['id' => $model
             <div class="btn-invoice clearfix">
                 <a href="<?= Url::to(['pdf', 'alias' => $model->alias]) ?>" class="btn btn-primary btn-lg mr5 pull-left"><i class="glyphicon glyphicon glyphicon-print"></i> <?= Yii::t('adm/admoplata','Print Invoice', ['dot' => false]) ?></a>
                 <?php if ($model->response_status === OplataTransaction::STATUS_NOT_PAID) {?>
-                    <a href="<?= Url::to(['send', 'alias' => $model->alias]) ?>" class="btn btn-primary btn-lg mr5 pull-right"><?= Yii::t('adm/admoplata','Make A Payment', ['dot' => false]) ?></a>
+
+                    <?php if ($model->oplataHasCurrency()) {?>
+                        <a href="<?= Url::to(['send', 'alias' => $model->alias]) ?>" class="btn btn-primary btn-lg mr5 pull-right"><?= Yii::t('adm/admoplata','Make A Payment', ['dot' => false]) ?></a>
+                    <?php }?>
+
+                    <?php if ($model->paypalHasCurrency()) {?>
+                        <a href="<?= Url::to(['send-paypal', 'alias' => $model->alias]) ?>" class="btn btn-primary btn-lg mr5 pull-right"><?= Yii::t('adm/admoplata','Make A Payment(Paypal)', ['dot' => false]) ?></a>
+                    <?php }?>
+
                 <?php }?>
                 <?= Yii::t('adm/admoplata','Make A Payment', ['dot' => '.']) ?>
+                <?= Yii::t('adm/admoplata','Make A Payment(Paypal)', ['dot' => '.']) ?>
                 <?= Yii::t('adm/admoplata','Print Invoice', ['dot' => '.']) ?>
+
             </div>
             <div class="mb30"></div>
             <div class="alert alert-info nomargin">

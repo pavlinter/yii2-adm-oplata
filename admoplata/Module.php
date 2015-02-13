@@ -66,7 +66,7 @@ class Module extends \yii\base\Module implements AdmBootstrapInterface
             //'href' => '',
         ],
     ];
-    
+
     /**
      * @inheritdoc
      */
@@ -119,6 +119,9 @@ class Module extends \yii\base\Module implements AdmBootstrapInterface
         if (!isset($this->methodList[OplataTransaction::METHOD_OPLATA])) {
             $this->methodList[OplataTransaction::METHOD_OPLATA] = Yii::t('admoplata/oplata_method', 'oplata.com');
         }
+        if (!isset($this->methodList[OplataTransaction::METHOD_PAYPAL])) {
+            $this->methodList[OplataTransaction::METHOD_PAYPAL] = Yii::t('admoplata/oplata_method', 'paypal.com');
+        }
     }
 
     /**
@@ -152,6 +155,23 @@ class Module extends \yii\base\Module implements AdmBootstrapInterface
      */
     public function registerTranslations()
     {
+        if (!isset(Yii::$app->i18n->translations['adm*'])) {
+            Yii::$app->i18n->translations['adm*'] = [
+                'class' => 'pavlinter\translation\DbMessageSource',
+                'forceTranslation' => true,
+                'autoInsert' => true,
+                'dotMode' => true,
+            ];
+        }
+        if (!isset(Yii::$app->i18n->translations['modelAdm*'])) {
+            Yii::$app->i18n->translations['modelAdm*'] = [
+                'class' => 'pavlinter\translation\DbMessageSource',
+                'forceTranslation' => true,
+                'autoInsert' => true,
+                'dotMode' => false,
+            ];
+        }
+
         if (!isset(Yii::$app->i18n->translations['admoplata*'])) {
             Yii::$app->i18n->translations['admoplata*'] = [
                 'class' => 'pavlinter\translation\DbMessageSource',

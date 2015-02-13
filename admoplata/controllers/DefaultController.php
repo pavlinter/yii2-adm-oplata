@@ -154,15 +154,23 @@ class DefaultController extends Controller
         ]);
     }
 
+
     /**
      * Client side
+     * @param null $alias
      * @return string
      * @throws NotFoundHttpException
      */
-    public function actionResponse()
+    public function actionResponse($alias = null)
     {
-        list($order_id,) = explode(Oplata::ORDER_SEPARATOR, Yii::$app->request->post('order_id'));
-        $model = Module::getInstance()->manager->createOplataTransactionQuery()->where(['id' => $order_id])->one();
+        if ($alias) {
+            $where = ['alias' => $alias];
+        } else {
+            list($order_id,) = explode(Oplata::ORDER_SEPARATOR, Yii::$app->request->post('order_id'));
+            $where = ['id' => $order_id];
+        }
+
+        $model = Module::getInstance()->manager->createOplataTransactionQuery()->where($where)->one();
 
         if (!$model) {
             throw new NotFoundHttpException('The requested page does not exist.');
@@ -179,6 +187,63 @@ class DefaultController extends Controller
     public function actionServer()
     {
         $res = Yii::$app->oplata->checkPayment(Yii::$app->request->post());
+        if (!$res) {
+            $errors = Yii::$app->oplata->getErrors();
+            foreach ($errors as $error) {
+                Yii::warning($error, 'admoplata');
+            }
+        }
+    }
+
+    /**
+     * @param $alias
+     * @return \yii\web\Response
+     * @throws NotFoundHttpException
+     */
+    public function actionSendPaypal($alias)
+    {
+        $module = Module::getInstance();
+        if (!$alias) {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+        $model = $module->manager->createOplataTransactionQuery()->where(['alias' => $alias])->one();
+        if (!$model) {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+
+        if ($model->order_status !== null || !$model->paypalHasCurrency()) {
+            return $this->redirect(['invoice', 'alias' => $model->alias]);
+        }
+
+        $params = http_build_query([
+            'cmd' => '_xclick',
+            'business' => Yii::$app->oplata->paypalBusinessId,
+            'currency_code' => $model->currency,
+            'return' => Url::to(['response', 'alias' => $model->alias], true),
+            'cancel_return' => Url::to(['invoice', 'alias' => $model->alias]),
+            'cbt' => Module::t('paypal', 'Back to Site', ['dot' => false]),
+            'custom' => $model->id,
+            'quantity' => 1,
+            'lc' => strtoupper(Yii::$app->language),
+            'item_name' => $model->title,
+            'amount' => $model->price + $model->shipping,
+        ]);
+
+        $redirect = Yii::$app->oplata->paypalUrl . '?' . $params;
+
+        //return $redirect;
+        return $this->redirect($redirect);
+
+        //Redirect("?cmd=_xclick&business=xxxxxxxxx&currency_code=".$currency_code."&return=".$url."&cancel_ return=".$cancel_url."&cbt=".$merchant_button."&custom=".$login."&quantity=1&lc=LV&item_name=".$item_name."&amount=".$price);
+
+    }
+
+    /**
+     * Server response
+     */
+    public function actionServerPaypal()
+    {
+        $res = Yii::$app->oplata->checkPaymentPaypal(Yii::$app->request->post());
         if (!$res) {
             $errors = Yii::$app->oplata->getErrors();
             foreach ($errors as $error) {

@@ -15,6 +15,7 @@ use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\BaseActiveRecord;
 use yii\db\Expression;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "{{%oplata_transaction}}".
@@ -47,11 +48,18 @@ use yii\db\Expression;
 class OplataTransaction extends \yii\db\ActiveRecord
 {
     const METHOD_OPLATA = "oplata.com";
+    const METHOD_PAYPAL = "paypal.com";
 
-    const CURRENCY_EUR = "EUR";
-    const CURRENCY_USD = "USD";
+    //only for oplata USD, EUR, RUB, UAH
     const CURRENCY_RUB = "RUB";
     const CURRENCY_UAH = "UAH";
+    //only for paypal USD, EUR, GBP, CAD,JPY
+    const CURRENCY_GBP = "GBP";
+    const CURRENCY_CAD = "CAD";
+    const CURRENCY_JPY = "JPY";
+    //for all
+    const CURRENCY_EUR = "EUR";
+    const CURRENCY_USD = "USD";
 
     const STATUS_NOT_PAID = 'not paid';
     const STATUS_FAILURE  = 'failure';
@@ -220,12 +228,27 @@ class OplataTransaction extends \yii\db\ActiveRecord
      */
     public static function currency_list($currency = false)
     {
-        $list = [
-            self::CURRENCY_EUR => Yii::t('modelAdm/oplata_transaction', 'EUR'),
-            self::CURRENCY_USD => Yii::t('modelAdm/oplata_transaction', 'USD'),
-            self::CURRENCY_RUB => Yii::t('modelAdm/oplata_transaction', 'RUB'),
-            self::CURRENCY_UAH => Yii::t('modelAdm/oplata_transaction', 'UAH'),
-        ];
+        $oplata = $paypal = [];
+        if (Yii::$app->oplata->merchantId) {
+            $oplata = [
+                self::CURRENCY_EUR => Yii::t('modelAdm/oplata_transaction', 'EUR'),
+                self::CURRENCY_USD => Yii::t('modelAdm/oplata_transaction', 'USD'),
+                self::CURRENCY_RUB => Yii::t('modelAdm/oplata_transaction', 'RUB'),
+                self::CURRENCY_UAH => Yii::t('modelAdm/oplata_transaction', 'UAH'),
+            ];
+        }
+        if (Yii::$app->oplata->paypalBusinessId) {
+            $paypal = [
+                self::CURRENCY_EUR => Yii::t('modelAdm/oplata_transaction', 'EUR'),
+                self::CURRENCY_USD => Yii::t('modelAdm/oplata_transaction', 'USD'),
+                self::CURRENCY_GBP => Yii::t('modelAdm/oplata_transaction', 'GBP'),
+                self::CURRENCY_CAD => Yii::t('modelAdm/oplata_transaction', 'CAD'),
+                self::CURRENCY_JPY => Yii::t('modelAdm/oplata_transaction', 'JPY'),
+            ];
+        }
+
+        $list = ArrayHelper::merge($oplata, $paypal);
+
         if ($currency) {
             if (isset($list[$currency])) {
                 return $list[$currency];
@@ -273,6 +296,38 @@ class OplataTransaction extends \yii\db\ActiveRecord
             return null;
         }
         return $list;
+    }
+
+    /**
+     * @return bool
+     */
+    public function paypalHasCurrency()
+    {
+        if (!Yii::$app->oplata->paypalBusinessId) {
+            return false;
+        }
+        return in_array($this->currency,[
+            self::CURRENCY_EUR,
+            self::CURRENCY_USD,
+            self::CURRENCY_GBP,
+            self::CURRENCY_CAD,
+            self::CURRENCY_JPY
+        ]);
+    }
+    /**
+     * @return bool
+     */
+    public function oplataHasCurrency()
+    {
+        if (!Yii::$app->oplata->merchantId) {
+            return false;
+        }
+        return in_array($this->currency,[
+            self::CURRENCY_EUR,
+            self::CURRENCY_USD,
+            self::CURRENCY_RUB,
+            self::CURRENCY_UAH
+        ]);
     }
 
 }

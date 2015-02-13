@@ -64,6 +64,10 @@ class Oplata extends Component
 
     public $url = 'https://api.oplata.com/api/checkout/redirect/'; //'https://api.oplata.com/api/checkout/url/';
 
+    public $paypalUrl = 'https://www.paypal.com/cgi-bin/webscr';
+
+    public $paypalBusinessId;
+
     public $responseFields = [
         'lang',
         'rrn',
@@ -200,6 +204,112 @@ class Oplata extends Component
             $this->setError('Error 7: #{order_id}, status: {order_status}', $response);
         }
         return true;
+    }
+
+    /**
+     * @param $response
+     * @return bool|string
+     */
+    public function checkPaymentPaypal($post)
+    {
+        $this->clearErrors();
+        $data = serialize($post);
+
+        // read the post from PayPal system and add 'cmd'
+        $req = 'cmd=_notify-validate';
+
+        foreach ($post as $key => $value) {
+            $value = urlencode(stripslashes($value));
+            $req .= "&$key=$value";
+        }
+
+        // post back to PayPal system to validate
+        $header = "POST /cgi-bin/webscr HTTP/1.0\r\n";
+        $header .= "Content-Type: application/x-www-form-urlencoded\r\n";
+        $header .= "Content-Length: " . strlen($req) . "\r\n\r\n";
+        $fp = fsockopen ('ssl://www.paypal.com', 443, $errno, $errstr, 30);
+
+        // assign posted variables to local variables
+        $payment_status = Yii::$app->request->post('payment_status', '');
+        $order_id = Yii::$app->request->post('custom', '');
+
+        $item_name = Yii::$app->request->post('item_name', '');
+        $quantity = Yii::$app->request->post('quantity', 0);
+        $first_name = Yii::$app->request->post('first_name', '');
+        $last_name = Yii::$app->request->post('last_name', '');
+        $amount = Yii::$app->request->post('mc_gross', 0);
+        $payment_date = date( "Y-m-d H:i:s", strtotime(Yii::$app->request->post('payment_date', 0)) );
+        $payment_currency = Yii::$app->request->post('mc_currency', '');
+
+        if (!$fp) {
+            // HTTP ERROR
+            $this->setError('Error 1:Paypal #{custom}, status: {payment_status}', $post);
+            return false;
+        } else {
+            fputs ($fp, $header . $req);
+            $return = false;
+            while (!feof($fp)) {
+                $res = fgets ($fp, 1024);
+                if (strcmp ($res, "VERIFIED") == 0) {
+                    // check the payment_status is Completed
+                    // check that txn_id has not been previously processed
+                    // check that receiver_email is your Primary PayPal email
+                    // check that payment_amount/payment_currency are correct
+                    // process payment
+                    if ($payment_status == "Completed"){
+
+                        $return = true;
+                        break;
+                    } else {
+                        $this->setError('Error 2:Paypal #{custom}, status: {payment_status}', $post);
+                        $return = false;
+                        break;
+                    }
+                } else if (strcmp ($res, "INVALID") == 0) {
+                    // log for manual investigation
+                    /* @var $order \pavlinter\admoplata\models\OplataTransaction  */
+                    $order = Module::getInstance()->manager->createOplataTransactionQuery()->where(['id' => $order_id])->one();
+
+                    if (!$order) {
+                        $this->setError('Error 3:Paypal #{custom}, status: {payment_status}', $post);
+                        $return = true;
+                        break;
+                    }
+
+                    if ($payment_status == "Completed"){
+                        if ($order->response_status == $order::STATUS_NOT_PAID) {
+                            $order->order_status = self::ORDER_APPROVED;
+                            $order->response_status = $order::STATUS_SUCCESS;
+                            $order->response_data = $data;
+                            $order->method = OplataTransaction::METHOD_PAYPAL;
+                            if (!$order->save(false)) {
+                                $this->setError('Error 6: #{order_id}, status: {order_status}', $post);
+                                return false;
+                            }
+                        }
+                        $return = true;
+                        break;
+                    } else {
+
+                        if ($order->response_status == $order::STATUS_NOT_PAID) {
+                            $order->order_status = self::ORDER_DECLINED;
+                            $order->response_status = $order::STATUS_FAILURE;
+                            $order->response_data = $data;
+                            $order->method = OplataTransaction::METHOD_PAYPAL;
+                            if (!$order->save(false)) {
+                                $this->setError('Error 6: #{order_id}, status: {order_status}', $post);
+                                return false;
+                            }
+                        }
+                        $return = false;
+                        break;
+                    }
+                }
+            }
+            fclose ($fp);
+            return $return;
+        }
+        return false;
     }
 
     /**
